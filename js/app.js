@@ -1,24 +1,9 @@
-/* app logic will live here */
-console.log("Mastermind loaded");
+/*-------------------------------- Constants --------------------------------*/
 
-/* =========================================
-   Mastermind - Game State + Initialization
-   Principle: Separation of Concerns (SoC)
-   - State lives here
-   - UI rendering will come later
-   ========================================= */
+const CODE_LENGTH = 4; /* number of slots in the secret code */
+const MAX_TURNS = 10; /* number of guesses the player gets */
 
-/* -----------------------------------------
-   Constants (do not change during a game)
-   ----------------------------------------- */
-
-const CODE_LENGTH = 4; /* how many slots in the secret code */
-const MAX_TURNS = 10; /* how many guesses the player gets */
-
-/* -----------------------------------------
-   State (changes during the game)
-   Principle: Single Source of Truth
-   ----------------------------------------- */
+/*---------------------------- Variables (state) ----------------------------*/
 
 let secretCode; /* array of colors like ["red","blue","green","yellow"] */
 let currentGuess; /* array of colors the player is building */
@@ -26,26 +11,48 @@ let turn; /* number of guesses used so far */
 let gameStatus; /* "playing" | "won" | "lost" */
 let isSoundOn; /* true or false */
 
-/* -----------------------------------------
-   init()
-   Principle: Idempotent Initialization
-   - calling init() always resets the game safely
-   ----------------------------------------- */
+/*------------------------ Cached Element References ------------------------*/
+
+/* This file is loaded with `defer` in index.html,
+   so the DOM is fully loaded before this code runs */
+
+const messageEl = document.querySelector("#message"); /* where messages appear */
+
+/*-------------------------------- Functions --------------------------------*/
+
+function renderMessage() {
+    /* Principle: State-Driven UI (Single Source of Truth)
+       The UI reads from state and does not decide anything itself. */
+
+    if (gameStatus === "playing") {
+        messageEl.textContent = `Turn ${turn + 1} of ${MAX_TURNS}: build your guess`;
+        return; /* Guard Clause: exit early */
+    }
+
+    if (gameStatus === "won") {
+        messageEl.textContent = "You cracked the code! 🎉";
+        return; /* Guard Clause: exit early */
+    }
+
+    if (gameStatus === "lost") {
+        messageEl.textContent = "Out of turns. Better luck next time!";
+    }
+}
 
 function init() {
-    /* reset game state */
+    /* Principle: Idempotent Initialization
+       Calling init() multiple times safely resets the game. */
+
     secretCode = []; /* will be generated later */
     currentGuess = []; /* empty guess */
     turn = 0; /* start at turn 0 */
     gameStatus = "playing"; /* game is active */
     isSoundOn = true; /* sound starts on */
 
-    /* temporary message so we can test init() works */
-    console.log("init ran: game reset"); /* incremental testing */
+    renderMessage(); /* Event -> Update State -> Render UI (state -> UI) */
 }
 
-/* -----------------------------------------
-   Run once when the page loads
-   ----------------------------------------- */
+/*----------------------------- Event Listeners -----------------------------*/
 
+/* Run once when the page loads */
 init();
