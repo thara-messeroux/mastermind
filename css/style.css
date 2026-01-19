@@ -4,3 +4,17 @@ body {
     margin: 24px;
 }
 
+/* Container for guess slots */
+#guess-slots {
+    display: flex;
+    gap: 12px;
+    margin: 12px 0;
+}
+
+/* One empty guess circle */
+.guess-slot {
+    width: 40px;
+    height: 40px;
+    border: 2px solid #555;
+    border-radius: 50%;
+}
