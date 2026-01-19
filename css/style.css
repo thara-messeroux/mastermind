@@ -18,3 +18,32 @@ body {
     border: 2px solid #555;
     border-radius: 50%;
 }
+
+/*--------------------------- Palette layout ---------------------------*/
+
+/* 
+  Use flexbox so color buttons line up in one row 
+  instead of stacking vertically
+*/
+#palette {
+    display: flex;
+    gap: 12px;
+    /* space between buttons */
+    margin: 12px 0;
+    /* space above and below palette */
+}
+
+/*--------------------------- Color buttons ----------------------------*/
+
+/* 
+  Make each color button look like a clickable circle
+*/
+.color-btn {
+    width: 40px;
+    height: 40px;
+    border: 2px solid #555;
+    border-radius: 50%;
+    /* turns square into a circle */
+    cursor: pointer;
+    /* shows this is clickable */
+}
