@@ -105,6 +105,7 @@ function renderGuessSlots() {
     }
 }
 
+/* DRAW BUTTONS */
 function renderPalette() {
     /*
       This function draws the color buttons.
@@ -137,6 +138,13 @@ function renderPalette() {
         buttonEl.style.backgroundColor = color.hex;
         /* Visually make the button the color */
 
+        buttonEl.dataset.hex = color.hex;
+        /* save the color hex on the button so we can read it on click */
+
+        buttonEl.dataset.name = color.name;
+        /* save the human-friendly name on the button */
+
+        /* ACCESSIBILITY + ADHD-FRIENDLY */
         buttonEl.setAttribute("aria-label", `Choose ${color.name}`);
         /* Accessibility: screen readers can describe the button */
 
@@ -145,6 +153,25 @@ function renderPalette() {
     }
 }
 
+/* DETECT CLICKS */
+function handlePaletteClick(event) {
+    /* This runs when the user clicks inside the palette */
+
+    const clickedEl = event.target;
+    /* event.target is the exact thing the user clicked */
+
+    if (!clickedEl.classList.contains("color-btn")) {
+        return;
+        /* Guard clause: ignore clicks that are not on a color button */
+    }
+
+    const name = clickedEl.dataset.name;
+    /* Read the saved human-friendly name from the button */
+
+    console.log("Color clicked:", name);
+    /* Temporary testing: remove before final submission */
+
+}
 
 /*-------------------------------- Initialization ----------------------------*/
 
@@ -163,12 +190,23 @@ function init() {
     // Draw the UI based on the state
     renderMessage();     // Show correct message
     renderGuessSlots();  // Draw empty guess circles
+    /* SO BUTTONS APPEAR */
     renderPalette(); /* draw color buttons based on COLORS data */
 
 }
 
-/*----------------------------- Start the Game -----------------------------*/
 
+/*----------------------------- Event Listeners -----------------------------*/
+
+/* CONNECT CLICKS TO HANDLER */
+/*
+  This listens for clicks on the color palette.
+  We use ONE listener for all buttons (clean + simple).
+*/
+paletteEl.addEventListener("click", handlePaletteClick);
+
+
+/*----------------------------- Start the Game -----------------------------*/
 /*
   This runs as soon as the page loads.
   Because of `defer` in index.html, the HTML is ready.
