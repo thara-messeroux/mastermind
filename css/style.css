@@ -47,3 +47,36 @@ body {
     cursor: pointer;
     /* shows this is clickable */
 }
+
+/* the full board that holds all guess rows */
+#board {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    /* space between rows */
+    margin-bottom: 16px;
+}
+
+/* one horizontal row of guesses */
+.board-row {
+    display: flex;
+    gap: 8px;
+    /* space between slots */
+}
+
+/* one empty circle on the board */
+.board-slot {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    /* makes it a circle */
+    background-color: lightgray;
+    /* empty slot color */
+    border: 2px solid #999;
+}
+
+
+
+
+
+

@@ -199,6 +199,32 @@ function handleSubmitGuess() {
 }
 
 
+/*
+  Draw the empty game board.
+  This creates all rows and slots BEFORE the game starts.
+  Draw the empty game board (all turns, no guesses yet).
+  This is just the visual skeleton of the game.
+*/
+function renderBoard() {
+    const boardEl = document.querySelector("#board");
+    boardEl.innerHTML = "";
+
+    /* create one row per turn */
+    for (let row = 0; row < MAX_TURNS; row += 1) {
+        const rowEl = document.createElement("div");
+        rowEl.classList.add("board-row");
+
+        /* create one slot per color */
+        for (let col = 0; col < CODE_LENGTH; col += 1) {
+            const slotEl = document.createElement("div");
+            slotEl.classList.add("board-slot");
+            rowEl.appendChild(slotEl);
+        }
+
+        boardEl.appendChild(rowEl);
+    }
+}
+
 /*-------------------------------- Initialization ----------------------------*/
 
 /*
@@ -214,11 +240,12 @@ function init() {
     isSoundOn = true;
     guesses = []; /* start with no submitted guesses */
 
-
     /* Draw the UI from the state (State → Render) */
     renderMessage();
     renderGuessSlots();
     renderPalette();
+    renderBoard();
+
 }
 
 /*----------------------------- Event Listeners -----------------------------*/
