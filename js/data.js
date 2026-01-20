@@ -1,9 +1,14 @@
 /*-------------------------------- Constants --------------------------------*/
 
-/*
-  Add colors
-  This is our "menu" of available colors.
-  We keep it in data.js so it is easy to find and reuse.
+/* 
+  These are the colors the player can choose from.
+  We use hex colors so the game looks modern and consistent.
 */
-const COLORS = ["blue", "green", "orange", "purple", "red", "yellow"];
-
+const COLORS = [
+    "#3B0855", /* deep purple */
+    "#852467", /* plum */
+    "#FD8083", /* soft coral */
+    "#EE227D", /* neon pink */
+    "#498099", /* muted blue */
+    "#30C0B7"  /* teal */
+];
