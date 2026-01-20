@@ -36,6 +36,10 @@ const guessSlotsEl = document.querySelector("#guess-slots");
 const paletteEl = document.querySelector("#palette");
 /* where we draw the color buttons (the palette) */
 
+const submitBtnEl = document.querySelector("#submit-guess");
+/* the button the user clicks to submit their guess */
+
+
 /*-------------------------------- Functions --------------------------------*/
 
 /*
@@ -58,6 +62,12 @@ function renderMessage() {
     if (gameStatus === "lost") {
         messageEl.textContent = "Out of turns. Better luck next time!";
     }
+
+    if (gameStatus === "locked") {
+        messageEl.textContent = "Guess submitted! (Next: checking feedback)";
+        return;
+    }
+
 }
 
 /*
@@ -120,9 +130,15 @@ function renderPalette() {
 /*
   Handle palette clicks.
   Principle: Event → (Update State) → Render
-  Right now: we are still testing clicks by logging the name.
+  User clicks a color → we save it in currentGuess → we redraw the slots
 */
+
 function handlePaletteClick(event) {
+    if (gameStatus !== "playing") {
+        return;
+        /* Ignore color clicks once the guess is submitted */
+    }
+
     const clickedEl = event.target;
     /* the exact element the user clicked */
 
@@ -159,6 +175,21 @@ function handlePaletteClick(event) {
     renderGuessSlots();
 }
 
+function handleSubmitGuess() {
+    /* User clicks Submit → we lock the current guess */
+
+    if (currentGuess.length < CODE_LENGTH) {
+        return;
+        /* Safety check: cannot submit until all 4 slots are filled */
+    }
+
+    gameStatus = "locked";
+    /* mark this guess as finished */
+
+    renderMessage();
+    /* update the message so the user knows the guess is locked */
+}
+
 /*-------------------------------- Initialization ----------------------------*/
 
 /*
@@ -186,6 +217,10 @@ function init() {
   When any color button is clicked, handlePaletteClick runs.
 */
 paletteEl.addEventListener("click", handlePaletteClick);
+
+submitBtnEl.addEventListener("click", handleSubmitGuess);
+/* connect Submit button to its handler */
+
 
 /*----------------------------- Start the Game ------------------------------*/
 
