@@ -1,17 +1,47 @@
-/* basic page styling */
 body {
     font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     margin: 24px;
 }
 
-/* Container for guess slots */
+.top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.controls {
+    display: flex;
+    gap: 10px;
+}
+
+button {
+    padding: 8px 12px;
+    border: 1px solid #999;
+    border-radius: 10px;
+    background: #f6f6f6;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #eeeeee;
+}
+
+/* Disabled buttons look clearly unclickable */
+button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    background-color: #e6e6e6;
+    border: 1px solid #999;
+}
+
+/* Current guess area */
 #guess-slots {
     display: flex;
     gap: 12px;
     margin: 12px 0;
 }
 
-/* One empty guess circle */
 .guess-slot {
     width: 40px;
     height: 40px;
@@ -19,96 +49,75 @@ body {
     border-radius: 50%;
 }
 
-/*--------------------------- Palette layout ---------------------------*/
-
-/* 
-  Use flexbox so color buttons line up in one row 
-  instead of stacking vertically
-*/
+/* Palette buttons */
 #palette {
     display: flex;
     gap: 12px;
-    /* space between buttons */
     margin: 12px 0;
-    /* space above and below palette */
 }
 
-/*--------------------------- Color buttons ----------------------------*/
-
-/* 
-  Make each color button look like a clickable circle
-*/
 .color-btn {
     width: 40px;
     height: 40px;
     border: 2px solid #555;
     border-radius: 50%;
-    /* turns square into a circle */
     cursor: pointer;
-    /* shows this is clickable */
 }
 
-/* the full board that holds all guess rows */
+/* History board layout */
 #board {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    /* space between rows */
+    gap: 10px;
     margin-bottom: 16px;
 }
 
-/* one horizontal row of guesses */
 .board-row {
     display: flex;
-    gap: 8px;
-    /* space between slots */
+    align-items: center;
+    gap: 12px;
 }
 
-/* 
-  One circle on the game board (history rows)
-  This represents one color slot in a past guess
-*/
+.board-slots {
+    display: flex;
+    gap: 8px;
+}
+
 .board-slot {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    /* makes the square a circle */
     border: 2px solid #555;
-    /* same border as guess-slot for consistency */
     background-color: transparent;
-    /* 
-      transparent = empty slot
-      color will be added later by JavaScript when a guess is submitted
-    */
 }
 
-/* 
-  Visual feedback for a disabled Submit button
-  This helps users understand they must finish their guess first
-*/
-#submit-guess:disabled {
-    opacity: 0.5;
-    /* makes button look faded */
-    cursor: not-allowed;
-    /* shows it cannot be clicked */
+/* Feedback peg box (2x2 grid) */
+.peg-box {
+    display: grid;
+    grid-template-columns: repeat(2, 10px);
+    grid-auto-rows: 10px;
+    gap: 6px;
+    padding: 6px;
+    border: 1px dashed #aaa;
+    border-radius: 10px;
+    min-width: 36px;
+    min-height: 36px;
 }
 
-/* 
-  Disabled buttons: make it obvious you can't click yet
-  This applies to ANY disabled button, including Submit Guess
-*/
-button:disabled {
-    opacity: 0.45; /* faded */
-    cursor: not-allowed; /* show "can't click" cursor */
-    background-color: #e6e6e6; /* looks disabled */
-    border: 1px solid #999; /* softer border */
+/* Each peg is a tiny circle */
+.peg {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid #666;
 }
 
+/* Exact match peg (right color + right spot) */
+.peg.exact {
+    background: #111;
+}
 
-
-
-
-
-
-
-
+/* Color-only peg (right color, wrong spot) */
+.peg.color-only {
+    background: #fff;
+}

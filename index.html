@@ -12,27 +12,39 @@
 
 <body>
     <main>
-        <h1>Mastermind</h1>
+        <header class="top">
+            <h1>Mastermind</h1>
+
+            <!-- Small controls: reset the game + toggle sound -->
+            <div class="controls">
+                <button id="reset" type="button">Reset</button>
+                <button id="sound-toggle" type="button">Sound: On</button>
+            </div>
+        </header>
+
+        <!-- Game message (turn counter / win / lose) -->
         <p id="message"></p>
 
         <section>
             <h2>Board</h2>
+            <!-- History board: past guesses + feedback pegs -->
             <div id="board"></div>
         </section>
 
         <section>
             <h2>Current Guess</h2>
+            <!-- The 4 circles the player is building right now -->
             <div id="guess-slots"></div>
+
+            <!-- Submit is disabled until the guess has 4 colors -->
+            <button id="submit-guess" type="button">Submit Guess</button>
         </section>
-        
+
         <section>
             <h2>Colors</h2>
+            <!-- Click these buttons to build a guess -->
             <div id="palette"></div>
         </section>
-
-        <button id="submit-guess" type="button">Submit Guess</button>
-        
-
     </main>
 </body>
 
