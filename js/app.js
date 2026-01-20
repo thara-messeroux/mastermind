@@ -217,6 +217,39 @@ function handlePaletteClick(event) {
 }
 
 /*
+  Count EXACT matches between the player's guess and the secret code.
+
+  "Exact match" means:
+  - same color
+  - same position
+
+  simple example:
+  secret: [A, B, C, D]
+  guess:  [A, X, C, Y]
+  exact matches = 2 (A and C are perfect matches)
+*/
+function countExactMatches(guess, code) {
+    let exact = 0;
+    /* exact will count how many perfect matches we found */
+
+    for (let i = 0; i < CODE_LENGTH; i += 1) {
+        /*
+          We compare slot-by-slot:
+          - guess[i] is the color picked by the player in this position
+          - code[i] is the secret color in this same position
+        */
+        if (guess[i].hex === code[i].hex) {
+            exact += 1;
+            /* add 1 because this position is a perfect match */
+        }
+    }
+
+    return exact;
+    /* return the final count */
+}
+
+
+/*
   When the player clicks Submit:
   - Save the guess
   - Move to the next turn
@@ -229,6 +262,15 @@ function handleSubmitGuess() {
     if (currentGuess.length < CODE_LENGTH) {
         return; /* cannot submit until all slots are filled */
     }
+
+    const exactMatches = countExactMatches(currentGuess, secretCode);
+    /*
+      We compare the guess vs the secret code.
+      For now, we only count "exact matches".
+    */
+   
+    /* exactMatches is used later to create feedback pegs and detect a win */
+
 
     /* save a COPY of the guess so future changes don’t affect history */
     guesses.push([...currentGuess]);
@@ -293,7 +335,7 @@ function getRandomCode() {
 */
 function init() {
     secretCode = Object.freeze(getRandomCode());
-    
+
     /*
       At the start of every new game:
       - we generate a fresh hidden code
