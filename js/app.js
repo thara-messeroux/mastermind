@@ -292,12 +292,19 @@ function getRandomCode() {
   Principle: Idempotent Initialization
 */
 function init() {
-    secretCode = getRandomCode();
+    secretCode = Object.freeze(getRandomCode());
+    
     /*
       At the start of every new game:
       - we generate a fresh hidden code
       - the player will try to guess it
     */
+
+    /*
+     We freeze the secret code so it stays the same during the whole game.
+     (Freeze = “do not allow changes by accident”.)
+   */
+
 
     currentGuess = [];
     turn = 0;
