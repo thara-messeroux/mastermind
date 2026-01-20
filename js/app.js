@@ -14,13 +14,12 @@ const MAX_TURNS = 10;  /* the player gets 10 guesses */
   - The state is the truth
   - The UI will read from state
 */
-let secretCode;    /* the hidden code the player is trying to guess (later) */
+let secretCode; /* the hidden code the player is trying to guess (later) */
 let currentGuess;  /* the colors the player is building right now */
-let turn;          /* which turn the player is on (0-based) */
-let gameStatus; /* "playing" |"won" | "lost" */
-let isSoundOn;     /* sound on/off (later) */
+let turn;  /* which turn the player is on (0-based) */
+let gameStatus;  /* "playing" |"won" | "lost" */
+let isSoundOn;  /* sound on/off (later) */
 let guesses; /* all past guesses, one row per turn */
-
 
 /*------------------------ Cached Element References ------------------------*/
 
@@ -41,6 +40,8 @@ const paletteEl = document.querySelector("#palette");
 const submitBtnEl = document.querySelector("#submit-guess");
 /* the button the user clicks to submit their guess */
 
+const boardEl = document.querySelector("#board");
+/* where we draw all submitted guesses (10 rows) */
 
 /*-------------------------------- Functions --------------------------------*/
 
@@ -64,7 +65,6 @@ function renderMessage() {
     if (gameStatus === "lost") {
         messageEl.textContent = "Out of turns. Better luck next time!";
     }
-  
 }
 
 /*
@@ -125,88 +125,12 @@ function renderPalette() {
 }
 
 /*
-  Handle palette clicks.
-  Principle: Event → (Update State) → Render
-  User clicks a color → we save it in currentGuess → we redraw the slots
-*/
-
-function handlePaletteClick(event) {
-    if (gameStatus !== "playing") {
-        return;
-        /* Safety check: only accept color clicks when the game is in "playing" mode */
-    }
-
-    const clickedEl = event.target;
-    /* the exact element the user clicked */
-
-    if (!clickedEl.classList.contains("color-btn")) {
-        return;
-        /* guard clause: ignore clicks that are not on a color button */
-    }
-
-    if (currentGuess.length >= CODE_LENGTH) {
-        return;
-        /* Safety check: stop adding colors once all 4 slots are filled */
-    }
-
-    /* User clicked a color → we remember it → we update the circles on screen */
-
-    const hex = clickedEl.dataset.hex;
-    /* get the hex value saved on the button */
-
-    let selectedColor = null;
-    /* we will store the matching color object here */
-
-    /* We are checking each color until we find the one the user clicked, then we stop the loop */
-    for (let i = 0; i < COLORS.length; i++) {
-        if (COLORS[i].hex === hex) {
-            selectedColor = COLORS[i];
-            break;
-        }
-    }
-
-    /* add the selected color to the current guess */
-    currentGuess.push(selectedColor);
-
-    /* redraw the guess slots so the color appears */
-    renderGuessSlots();
-}
-
-/* 
-When the player clicks Submit, this function saves the finished guess, 
-moves the game to the next turn, clears the circles, 
-and lets the player start a new guess. 
-*/
-function handleSubmitGuess() {
-    if (currentGuess.length < CODE_LENGTH) {
-        return;
-        /* cannot submit until all slots are filled */
-    }
-
-    /* save this finished guess */
-    guesses.push(currentGuess);
-
-    /* move to next turn */
-    turn += 1;
-
-    /* reset for the next row */
-    currentGuess = [];
-    gameStatus = "playing";
-
-    /* redraw UI */
-    renderMessage();
-    renderGuessSlots();
-}
-
-
-/*
-  Draw the empty game board.
-  This creates all rows and slots BEFORE the game starts.
-  Draw the empty game board (all turns, no guesses yet).
-  This is just the visual skeleton of the game.
+  Draw the game board (10 rows).
+  Principle: State → Render
+  - reads guesses[]
+  - draws what has been submitted so far
 */
 function renderBoard() {
-    const boardEl = document.querySelector("#board");
     boardEl.innerHTML = "";
 
     /* create one row per turn */
@@ -218,6 +142,14 @@ function renderBoard() {
         for (let col = 0; col < CODE_LENGTH; col += 1) {
             const slotEl = document.createElement("div");
             slotEl.classList.add("board-slot");
+
+            const guessForThisRow = guesses[row];
+            const selectedColor = guessForThisRow ? guessForThisRow[col] : null;
+
+            if (selectedColor) {
+                slotEl.style.backgroundColor = selectedColor.hex;
+            }
+
             rowEl.appendChild(slotEl);
         }
 
@@ -225,45 +157,96 @@ function renderBoard() {
     }
 }
 
+/*
+  Handle palette clicks.
+  Principle: Event → (Update State) → Render
+*/
+function handlePaletteClick(event) {
+    if (gameStatus !== "playing") return;
+
+    const clickedEl = event.target;
+
+    if (!clickedEl.classList.contains("color-btn")) return;
+
+    if (currentGuess.length >= CODE_LENGTH) return;
+
+    const hex = clickedEl.dataset.hex;
+
+    let selectedColor = null;
+
+    for (let i = 0; i < COLORS.length; i += 1) {
+        if (COLORS[i].hex === hex) {
+            selectedColor = COLORS[i];
+            break;
+        }
+    }
+
+    if (!selectedColor) return; /* safety */
+
+    currentGuess.push(selectedColor);
+
+    renderGuessSlots();
+}
+
+/*
+  When the player clicks Submit:
+  - Save the guess
+  - Move to the next turn
+  - Reset current guess
+  - Redraw board + UI
+*/
+function handleSubmitGuess() {
+    if (gameStatus !== "playing") return;
+
+    if (currentGuess.length < CODE_LENGTH) {
+        return; /* cannot submit until all slots are filled */
+    }
+
+    /* save a COPY of the guess so future changes don’t affect history */
+    guesses.push([...currentGuess]);
+
+    /* advance turn */
+    turn += 1;
+
+    /* if we used all turns, game is lost (win logic comes later) */
+    if (turn >= MAX_TURNS) {
+        gameStatus = "lost";
+    }
+
+    /* reset for next guess */
+    currentGuess = [];
+
+    /* redraw everything */
+    renderMessage();
+    renderGuessSlots();
+    renderBoard();
+}
+
 /*-------------------------------- Initialization ----------------------------*/
 
 /*
   Reset the entire game.
   Principle: Idempotent Initialization
-  - Calling init() always creates a fresh, correct starting state
 */
 function init() {
-    secretCode = [];   /* will be generated later */
-    currentGuess = []; /* empty guess at start */
+    secretCode = []; /* will be generated later */
+    currentGuess = [];
     turn = 0;
     gameStatus = "playing";
     isSoundOn = true;
-    guesses = []; /* start with no submitted guesses */
+    guesses = [];
 
-    /* Draw the UI from the state (State → Render) */
     renderMessage();
     renderGuessSlots();
     renderPalette();
     renderBoard();
-
 }
 
 /*----------------------------- Event Listeners -----------------------------*/
 
-/*
-  One listener for the whole palette (clean + simple).
-  When any color button is clicked, handlePaletteClick runs.
-*/
 paletteEl.addEventListener("click", handlePaletteClick);
-
 submitBtnEl.addEventListener("click", handleSubmitGuess);
-/* connect Submit button to its handler */
-
 
 /*----------------------------- Start the Game ------------------------------*/
 
-/*
-  Start once when the page loads.
-  Because of `defer` in index.html, the HTML is ready.
-*/
 init();
