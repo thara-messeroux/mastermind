@@ -64,16 +64,48 @@ body {
     /* space between slots */
 }
 
-/* one empty circle on the board */
+/* 
+  One circle on the game board (history rows)
+  This represents one color slot in a past guess
+*/
 .board-slot {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    /* makes it a circle */
-    background-color: lightgray;
-    /* empty slot color */
-    border: 2px solid #999;
+    /* makes the square a circle */
+    border: 2px solid #555;
+    /* same border as guess-slot for consistency */
+    background-color: transparent;
+    /* 
+      transparent = empty slot
+      color will be added later by JavaScript when a guess is submitted
+    */
 }
+
+/* 
+  Visual feedback for a disabled Submit button
+  This helps users understand they must finish their guess first
+*/
+#submit-guess:disabled {
+    opacity: 0.5;
+    /* makes button look faded */
+    cursor: not-allowed;
+    /* shows it cannot be clicked */
+}
+
+/* 
+  Disabled buttons: make it obvious you can't click yet
+  This applies to ANY disabled button, including Submit Guess
+*/
+button:disabled {
+    opacity: 0.45; /* faded */
+    cursor: not-allowed; /* show "can't click" cursor */
+    background-color: #e6e6e6; /* looks disabled */
+    border: 1px solid #999; /* softer border */
+}
+
+
+
 
 
 

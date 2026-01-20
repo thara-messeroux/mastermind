@@ -158,6 +158,26 @@ function renderBoard() {
 }
 
 /*
+Control whether the Submit button can be clicked.
+
+Rules:
+- Button should be enabled ONLY when:
+  1) The game is still being played
+  2) The player has selected exactly 4 colors
+*/
+function renderSubmitButton() {
+    submitBtnEl.disabled =
+        currentGuess.length !== CODE_LENGTH || gameStatus !== "playing";
+
+    /*
+      Explanation:
+      - If currentGuess is NOT 4 colors → disable button
+      - If game is NOT in "playing" state → disable button
+      - Otherwise → enable button
+    */
+}
+
+/*
   Handle palette clicks.
   Principle: Event → (Update State) → Render
 */
@@ -186,6 +206,14 @@ function handlePaletteClick(event) {
     currentGuess.push(selectedColor);
 
     renderGuessSlots();
+
+    renderSubmitButton();
+    /*
+      After every color click:
+      - Re-check if we now have 4 colors
+      - Enable submit ONLY if the guess is complete
+    */
+
 }
 
 /*
@@ -220,6 +248,13 @@ function handleSubmitGuess() {
     renderMessage();
     renderGuessSlots();
     renderBoard();
+    renderSubmitButton();
+    /*
+      After submitting:
+      - currentGuess is reset to []
+      - Submit button should be disabled again
+    */
+
 }
 
 /*-------------------------------- Initialization ----------------------------*/
@@ -240,6 +275,13 @@ function init() {
     renderGuessSlots();
     renderPalette();
     renderBoard();
+    renderSubmitButton();
+    /* 
+      At the start of the game:
+      - No colors are selected
+      - Submit button should be disabled
+    */
+
 }
 
 /*----------------------------- Event Listeners -----------------------------*/
@@ -250,3 +292,5 @@ submitBtnEl.addEventListener("click", handleSubmitGuess);
 /*----------------------------- Start the Game ------------------------------*/
 
 init();
+
+
