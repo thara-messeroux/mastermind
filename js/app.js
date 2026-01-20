@@ -17,7 +17,7 @@ const MAX_TURNS = 10;  /* the player gets 10 guesses */
 let secretCode;    /* the hidden code the player is trying to guess (later) */
 let currentGuess;  /* the colors the player is building right now */
 let turn;          /* which turn the player is on (0-based) */
-let gameStatus;    /* "playing" | "won" | "lost" */
+let gameStatus; /* "playing" | "locked" | "won" | "lost" */
 let isSoundOn;     /* sound on/off (later) */
 
 /*------------------------ Cached Element References ------------------------*/
@@ -54,6 +54,11 @@ function renderMessage() {
         return;
     }
 
+    if (gameStatus === "locked") {
+        messageEl.textContent = "Guess submitted! (Next: checking feedback)";
+        return;
+    }
+
     if (gameStatus === "won") {
         messageEl.textContent = "You cracked the code! 🎉";
         return;
@@ -62,12 +67,7 @@ function renderMessage() {
     if (gameStatus === "lost") {
         messageEl.textContent = "Out of turns. Better luck next time!";
     }
-
-    if (gameStatus === "locked") {
-        messageEl.textContent = "Guess submitted! (Next: checking feedback)";
-        return;
-    }
-
+  
 }
 
 /*
