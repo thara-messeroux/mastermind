@@ -1,56 +1,48 @@
 /*-------------------------------- Constants --------------------------------*/
 
 /*
-  These are rules of the game.
-  They never change while the game is running.
+  These are game rules (they do not change during a game).
 */
-
-const CODE_LENGTH = 4; // The secret code has 4 slots
-const MAX_TURNS = 10;  // The player gets 10 guesses
+const CODE_LENGTH = 4; /* the secret code has 4 slots */
+const MAX_TURNS = 10;  /* the player gets 10 guesses */
 
 /*---------------------------- Variables (state) ----------------------------*/
 
 /*
-  These values CAN change while the game runs.
-  This is the "memory" of the game.
+  These are the game’s memory (they WILL change while playing).
+  Principle: Single Source of Truth
+  - The state is the truth
+  - The UI will read from state
 */
-
-let secretCode;    // The hidden code the player is trying to guess
-let currentGuess; // What the player is currently building
-let turn;          // Which turn the player is on
-let gameStatus;    // "playing", "won", or "lost"
-let isSoundOn;     // Whether sound effects are on
+let secretCode;    /* the hidden code the player is trying to guess (later) */
+let currentGuess;  /* the colors the player is building right now */
+let turn;          /* which turn the player is on (0-based) */
+let gameStatus;    /* "playing" | "won" | "lost" */
+let isSoundOn;     /* sound on/off (later) */
 
 /*------------------------ Cached Element References ------------------------*/
 
 /*
-  We grab HTML elements ONCE and store them here.
-  This makes the code faster and easier to read.
+  We grab the HTML elements once and store them here.
+  This keeps code simple and avoids repeating querySelector.
+  Note: This works because app.js is loaded with `defer` in index.html.
 */
-
 const messageEl = document.querySelector("#message");
-/*
-  This element shows messages like:
-  "Turn 1 of 10" or "You won!"
-*/
+/* where we show messages like "Turn 1 of 10" or "You won!" */
 
 const guessSlotsEl = document.querySelector("#guess-slots");
-/*
-  This is the container where the empty guess circles will appear.
-*/
+/* where we draw the 4 guess circles */
 
 const paletteEl = document.querySelector("#palette");
-/*
-  This is the container where the color buttons will appear.
-  We draw buttons here using JavaScript.
-*/
+/* where we draw the color buttons (the palette) */
 
 /*-------------------------------- Functions --------------------------------*/
 
 /*
-  This function ONLY updates the message text.
-  It reads the game state and shows the correct message.
-  It does NOT change the game.
+  Render = "draw the screen".
+  Principle: State → Render
+  - This function reads state
+  - It does NOT change state
 */
 function renderMessage() {
     if (gameStatus === "playing") {
@@ -69,148 +61,134 @@ function renderMessage() {
 }
 
 /*
-  This function draws empty guess slots on the screen.
-
-  IMPORTANT:
-  - It does NOT change the game state
-  - It ONLY looks at the rules (CODE_LENGTH)
-  - Then it draws that many empty circles
+  Draw the guess slots.
+  - If currentGuess has a color for a slot, we fill it
+  - If not, the slot stays empty
+  Principle: State → Render (UI reads currentGuess)
 */
 function renderGuessSlots() {
-    /*
-      First, we clear anything that was there before.
-      This prevents duplicates if we re-render.
-    */
     guessSlotsEl.innerHTML = "";
+    /* clear old circles first so we don’t duplicate them */
 
-    /*
-      We repeat this loop CODE_LENGTH times.
-      If CODE_LENGTH is 4, this runs 4 times.
-    */
-    for (let i = 0; i < CODE_LENGTH; i++) {
-        /*
-          Create one empty slot
-        */
+    for (let i = 0; i < CODE_LENGTH; i += 1) {
         const slotEl = document.createElement("div");
-
-        /*
-          Give it a class so CSS can style it
-        */
         slotEl.classList.add("guess-slot");
 
-        /*
-          Add the slot to the page
-        */
+        const selectedColor = currentGuess[i];
+        /* this may be undefined if the player hasn’t picked this slot yet */
+
+        if (selectedColor) {
+            slotEl.style.backgroundColor = selectedColor.hex;
+            /* fill the circle using the color’s hex value */
+        }
+
         guessSlotsEl.appendChild(slotEl);
     }
 }
 
-/* DRAW BUTTONS */
+/*
+  Draw the color palette buttons.
+  Principle: Data-Driven UI
+  - COLORS decides how many buttons exist and what they look like
+*/
 function renderPalette() {
-    /*
-      This function draws the color buttons.
-  
-      It reads the COLORS array and creates one button per color.
-      This is called "data-driven UI" because data decides what we draw.
-    */
-
     paletteEl.innerHTML = "";
-    /* We clear old buttons first so we don’t duplicate them */
+    /* clear old buttons first so we don’t duplicate them */
 
-    for (let i = 0; i < COLORS.length; i++) {
+    for (let i = 0; i < COLORS.length; i += 1) {
         const color = COLORS[i];
-        /* Pick one color from the list */
+        /* color is an object like: { name: "Teal", hex: "#30C0B7" } */
 
         const buttonEl = document.createElement("button");
-        /* Create a new button element */
-
         buttonEl.classList.add("color-btn");
-        /* Add a class so CSS can style it */
-
         buttonEl.setAttribute("type", "button");
-        /* This prevents the button from trying to submit a form */
 
-        /*
-        Use the hex value for visuals
-        Use the name for accessibility
-        */
-
+        /* Visual: paint the button */
         buttonEl.style.backgroundColor = color.hex;
-        /* Visually make the button the color */
 
+        /* Memory on the button (so clicks can read it later) */
         buttonEl.dataset.hex = color.hex;
-        /* save the color hex on the button so we can read it on click */
-
         buttonEl.dataset.name = color.name;
-        /* save the human-friendly name on the button */
 
-        /* ACCESSIBILITY + ADHD-FRIENDLY */
+        /* Accessibility: screen readers get a friendly name */
         buttonEl.setAttribute("aria-label", `Choose ${color.name}`);
-        /* Accessibility: screen readers can describe the button */
 
         paletteEl.appendChild(buttonEl);
-        /* Put the button on the screen */
     }
 }
 
-/* DETECT CLICKS */
+/*
+  Handle palette clicks.
+  Principle: Event → (Update State) → Render
+  Right now: we are still testing clicks by logging the name.
+*/
 function handlePaletteClick(event) {
-    /* This runs when the user clicks inside the palette */
-
     const clickedEl = event.target;
-    /* event.target is the exact thing the user clicked */
+    /* the exact element the user clicked */
 
     if (!clickedEl.classList.contains("color-btn")) {
         return;
-        /* Guard clause: ignore clicks that are not on a color button */
+        /* guard clause: ignore clicks that are not on a color button */
     }
 
+    /* User clicked a color → we remember it → we update the circles on screen */
     const name = clickedEl.dataset.name;
-    /* Read the saved human-friendly name from the button */
+    /* read the saved friendly name from the button */
 
-    console.log("Color clicked:", name);
-    /* Temporary testing: remove before final submission */
+    const hex = clickedEl.dataset.hex;
+    /* get the hex value saved on the button */
 
+    let selectedColor = null;
+    /* we will store the matching color object here */
+
+    for (let i = 0; i < COLORS.length; i++) {
+        if (COLORS[i].hex === hex) {
+            selectedColor = COLORS[i];
+            break;
+        }
+    }
+    /* We are checking each color until we find the one the user clicked, then we stop the loop */
+
+
+    /* add the selected color to the current guess */
+    currentGuess.push(selectedColor);
+
+    /* redraw the guess slots so the color appears */
+    renderGuessSlots();
 }
 
 /*-------------------------------- Initialization ----------------------------*/
 
 /*
-  This function resets the entire game.
-  Calling init() always gives us a fresh start.
+  Reset the entire game.
+  Principle: Idempotent Initialization
+  - Calling init() always creates a fresh, correct starting state
 */
 function init() {
-    // Reset game memory
-    secretCode = [];      // Will be generated later
-    currentGuess = [];    // Start with no guess
-    turn = 0;             // Start at turn 0
+    secretCode = [];   /* will be generated later */
+    currentGuess = []; /* empty guess at start */
+    turn = 0;
     gameStatus = "playing";
     isSoundOn = true;
 
-    // Draw the UI based on the state
-    renderMessage();     // Show correct message
-    renderGuessSlots();  // Draw empty guess circles
-    /* SO BUTTONS APPEAR */
-    renderPalette(); /* draw color buttons based on COLORS data */
-
+    /* Draw the UI from the state (State → Render) */
+    renderMessage();
+    renderGuessSlots();
+    renderPalette();
 }
-
 
 /*----------------------------- Event Listeners -----------------------------*/
 
-/* CONNECT CLICKS TO HANDLER */
 /*
-  This listens for clicks on the color palette.
-  We use ONE listener for all buttons (clean + simple).
+  One listener for the whole palette (clean + simple).
+  When any color button is clicked, handlePaletteClick runs.
 */
 paletteEl.addEventListener("click", handlePaletteClick);
 
+/*----------------------------- Start the Game ------------------------------*/
 
-/*----------------------------- Start the Game -----------------------------*/
 /*
-  This runs as soon as the page loads.
+  Start once when the page loads.
   Because of `defer` in index.html, the HTML is ready.
 */
 init();
-
-
