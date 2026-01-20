@@ -257,6 +257,34 @@ function handleSubmitGuess() {
 
 }
 
+/*
+  Generate a random secret code for the game.
+
+  Child-simple explanation:
+  - We need 4 "secret" colors
+  - Each slot picks 1 random color from COLORS
+  - The player tries to guess this hidden code
+*/
+function getRandomCode() {
+    const code = [];
+    /* code will become an array of 4 color objects */
+
+    for (let i = 0; i < CODE_LENGTH; i += 1) {
+        const randomIndex = Math.floor(Math.random() * COLORS.length);
+        /* randomIndex becomes a random number from 0 to COLORS.length - 1 */
+
+        const randomColor = COLORS[randomIndex];
+        /* grab a random color object from COLORS */
+
+        code.push(randomColor);
+        /* put that random color into the secret code */
+    }
+
+    return code;
+    /* return the finished 4-color array */
+}
+
+
 /*-------------------------------- Initialization ----------------------------*/
 
 /*
@@ -264,7 +292,13 @@ function handleSubmitGuess() {
   Principle: Idempotent Initialization
 */
 function init() {
-    secretCode = []; /* will be generated later */
+    secretCode = getRandomCode();
+    /*
+      At the start of every new game:
+      - we generate a fresh hidden code
+      - the player will try to guess it
+    */
+
     currentGuess = [];
     turn = 0;
     gameStatus = "playing";
