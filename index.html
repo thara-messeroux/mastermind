@@ -5,45 +5,73 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mastermind</title>
+
+    <!-- Styles first -->
     <link rel="stylesheet" href="./css/style.css" />
+
+    <!-- Data (COLORS) must load before app.js -->
     <script defer src="./js/data.js"></script>
     <script defer src="./js/app.js"></script>
 </head>
 
 <body>
-    <main>
-        <header class="top">
-            <h1>Mastermind</h1>
+    <!-- 
+    Main app wrapper:
+    - Keeps content centered
+    - Creates the "board game" layout area
+  -->
+    <main class="app">
+        <!-- 
+      Header:
+      - Shows title + game message
+      - Shows small controls (reset/sound)
+    -->
+        <header class="top glass">
+            <div class="title">
+                <h1>Mastermind</h1>
+                <p id="message" class="subtext"></p>
+            </div>
 
-            <!-- Small controls: reset the game + toggle sound -->
             <div class="controls">
-                <button id="reset" type="button">Reset</button>
-                <button id="sound-toggle" type="button">Sound: On</button>
+                <button id="reset" type="button" class="btn">Reset</button>
+                <button id="sound-toggle" type="button" class="btn">Sound: On</button>
             </div>
         </header>
 
-        <!-- Game message (turn counter / win / lose) -->
-        <p id="message"></p>
+        <!-- 
+      "Table" surface:
+      - Two panels using CSS Grid
+      - Left: board history
+      - Right: current guess + palette + submit
+     -->
+        <section class="table glass">
+            <div class="layout">
+                <section class="panel">
+                    <h2 class="section-title">Board</h2>
+                    <div id="board"></div>
+                </section>
 
-        <section>
-            <h2>Board</h2>
-            <!-- History board: past guesses + feedback pegs -->
-            <div id="board"></div>
-        </section>
+                <section class="panel">
+                    <h2 class="section-title">Current Guess</h2>
+                    <div id="guess-slots"></div>
 
-        <section>
-            <h2>Current Guess</h2>
-            <!-- The 4 circles the player is building right now -->
-            <div id="guess-slots"></div>
+                    <h2 class="section-title">Colors</h2>
+                    <div id="palette"></div>
 
-            <!-- Submit is disabled until the guess has 4 colors -->
-            <button id="submit-guess" type="button">Submit Guess</button>
-        </section>
+                    <!-- 
+                        Submit is placed under Colors:
+                        - More natural flow: pick colors -> submit
+                    -->
+                    <button id="submit-guess" type="button" class="btn primary">
+                        Submit Guess
+                    </button>
 
-        <section>
-            <h2>Colors</h2>
-            <!-- Click these buttons to build a guess -->
-            <div id="palette"></div>
+                    <p class="hint">
+                        Pick 4 colors, then submit.
+                        (Press "C" to reveal the secret code for testing.)
+                    </p>
+                </section>
+            </div>
         </section>
     </main>
 </body>

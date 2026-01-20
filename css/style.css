@@ -1,123 +1,306 @@
-body {
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    margin: 24px;
+/* =========================
+   Theme tokens (easy edits)
+   ========================= */
+:root {
+    --ink: #1b1b1f;
+
+    /* Soft pastel background */
+    --bgA: #fff2ea;
+    --bgB: #ffeaf3;
+    --bgC: #fff7d6;
+
+    /* Liquid glass */
+    --glass: rgba(255, 255, 255, 0.62);
+    --glassBorder: rgba(255, 255, 255, 0.80);
+    --shadow: 0 18px 45px rgba(0, 0, 0, 0.08);
+
+    /* "Hand-drawn" line colors */
+    --lineSoft: rgba(27, 27, 31, 0.18);
+    --lineStrong: rgba(27, 27, 31, 0.38);
+
+    --radius: 18px;
+
+    /* Peg colors */
+    --pegBlack: #141416;
+    --pegWhite: #ffffff;
+    --pegBorder: rgba(0, 0, 0, 0.55);
 }
 
+/* =========================
+   Page background + centering
+   ========================= */
+body {
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    margin: 0;
+    color: var(--ink);
+    min-height: 100vh;
+
+    /* Pastel "cartoon" wash inspired by the reference */
+    background:
+        radial-gradient(circle at 16% 12%, #ffe2cf 0%, transparent 45%),
+        radial-gradient(circle at 86% 18%, #ffd6ea 0%, transparent 45%),
+        radial-gradient(circle at 30% 90%, #fff2b8 0%, transparent 45%),
+        linear-gradient(135deg, var(--bgA), var(--bgB));
+}
+
+/* App container: centers everything */
+.app {
+    max-width: 980px;
+    margin: 28px auto;
+    padding: 0 16px 30px;
+}
+
+/* =========================
+   Liquid glass card style
+   ========================= */
+.glass {
+    background: var(--glass);
+    border: 1px solid var(--glassBorder);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+
+    /* subtle paper speckle */
+    background-image:
+        radial-gradient(rgba(255, 255, 255, 0.35) 1px, transparent 1px);
+    background-size: 18px 18px;
+}
+
+/* =========================
+   Header
+   ========================= */
 .top {
     display: flex;
+    /* Flexbox used */
     align-items: center;
     justify-content: space-between;
     gap: 16px;
+    padding: 16px 18px;
+}
+
+.title h1 {
+    margin: 0;
+    font-size: 32px;
+    letter-spacing: 0.2px;
+}
+
+.subtext {
+    margin: 6px 0 0;
+    opacity: 0.85;
+    font-weight: 600;
 }
 
 .controls {
     display: flex;
+    /* Flexbox used */
     gap: 10px;
+    flex-wrap: wrap;
 }
 
-button {
-    padding: 8px 12px;
-    border: 1px solid #999;
-    border-radius: 10px;
-    background: #f6f6f6;
+/* =========================
+   Buttons
+   ========================= */
+.btn {
+    padding: 10px 12px;
+    border-radius: 14px;
     cursor: pointer;
+    transition: transform 120ms ease, background 120ms ease;
+
+    border: 2px solid var(--lineSoft);
+    background: rgba(255, 255, 255, 0.72);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.08);
 }
 
-button:hover {
-    background: #eeeeee;
+.btn:hover {
+    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.90);
 }
 
-/* Disabled buttons look clearly unclickable */
-button:disabled {
+.btn:disabled {
     opacity: 0.45;
     cursor: not-allowed;
-    background-color: #e6e6e6;
-    border: 1px solid #999;
+    transform: none;
 }
 
-/* Current guess area */
+.primary {
+    width: 100%;
+    margin-top: 12px;
+    font-weight: 800;
+    border: 2px solid var(--lineSoft);
+}
+
+/* =========================
+   Table layout
+   ========================= */
+.table {
+    margin-top: 14px;
+    padding: 18px;
+}
+
+/* Two-column layout using Grid */
+.layout {
+    display: grid;
+    /* Grid used */
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 18px;
+}
+
+/* Responsive stack */
+@media (max-width: 860px) {
+    .layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+.panel {
+    padding: 14px;
+    border-radius: var(--radius);
+    background: rgba(255, 255, 255, 0.38);
+    border: 2px solid rgba(0, 0, 0, 0.06);
+
+    /* subtle sketch outline */
+    outline: 2px dashed rgba(0, 0, 0, 0.07);
+    outline-offset: -10px;
+}
+
+.section-title {
+    margin: 0 0 10px;
+    font-size: 18px;
+}
+
+/* =========================
+   Current guess
+   ========================= */
 #guess-slots {
     display: flex;
+    /* Flexbox used */
     gap: 12px;
-    margin: 12px 0;
+    margin: 10px 0 14px;
 }
 
 .guess-slot {
-    width: 40px;
-    height: 40px;
-    border: 2px solid #555;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
+    border: 2px solid var(--lineStrong);
+    background: rgba(255, 255, 255, 0.70);
+
+    box-shadow:
+        inset 0 0 0 3px rgba(255, 255, 255, 0.70),
+        0 8px 16px rgba(0, 0, 0, 0.06);
 }
 
-/* Palette buttons */
+/* =========================
+   Palette
+   ========================= */
 #palette {
     display: flex;
+    /* Flexbox used */
     gap: 12px;
-    margin: 12px 0;
+    flex-wrap: wrap;
+    margin: 10px 0 6px;
 }
 
 .color-btn {
-    width: 40px;
-    height: 40px;
-    border: 2px solid #555;
+    width: 46px;
+    height: 46px;
     border-radius: 50%;
     cursor: pointer;
+
+    border: 2px solid var(--lineStrong);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.10);
+    transition: transform 120ms ease;
 }
 
-/* History board layout */
+.color-btn:hover {
+    transform: translateY(-2px) scale(1.03);
+}
+
+/* =========================
+   Board history
+   ========================= */
 #board {
     display: flex;
+    /* Flexbox used */
     flex-direction: column;
-    gap: 10px;
-    margin-bottom: 16px;
+    gap: 12px;
 }
 
 .board-row {
     display: flex;
+    /* Flexbox used */
     align-items: center;
+    justify-content: space-between;
     gap: 12px;
+
+    padding: 10px 10px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.42);
+
+    border: 2px solid rgba(0, 0, 0, 0.06);
+    outline: 2px dashed rgba(0, 0, 0, 0.07);
+    outline-offset: -8px;
 }
 
 .board-slots {
     display: flex;
-    gap: 8px;
+    /* Flexbox used */
+    gap: 10px;
 }
 
 .board-slot {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
-    border: 2px solid #555;
-    background-color: transparent;
+    border: 2px solid var(--lineSoft);
+    background: rgba(255, 255, 255, 0.62);
+
+    box-shadow:
+        inset 0 0 0 3px rgba(255, 255, 255, 0.70),
+        0 8px 16px rgba(0, 0, 0, 0.06);
 }
 
-/* Feedback peg box (2x2 grid) */
+/* =========================
+   Feedback pegs (2x2 = up to 4 pegs)
+   ========================= */
 .peg-box {
     display: grid;
-    grid-template-columns: repeat(2, 10px);
-    grid-auto-rows: 10px;
-    gap: 6px;
-    padding: 6px;
-    border: 1px dashed #aaa;
-    border-radius: 10px;
-    min-width: 36px;
-    min-height: 36px;
+    /* Grid used */
+    grid-template-columns: repeat(2, 14px);
+    grid-auto-rows: 14px;
+    gap: 7px;
+
+    padding: 10px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.70);
+
+    border: 2px dashed rgba(0, 0, 0, 0.20);
+    min-width: 52px;
+    min-height: 52px;
 }
 
-/* Each peg is a tiny circle */
 .peg {
-    width: 10px;
-    height: 10px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
-    border: 1px solid #666;
+    box-sizing: border-box;
+    border: 2px solid var(--pegBorder);
+    /* makes white pegs visible */
 }
 
-/* Exact match peg (right color + right spot) */
 .peg.exact {
-    background: #111;
+    background: var(--pegBlack);
+    border-color: rgba(0, 0, 0, 0.85);
 }
 
-/* Color-only peg (right color, wrong spot) */
 .peg.color-only {
-    background: #fff;
+    background: var(--pegWhite);
+    border-color: rgba(0, 0, 0, 0.55);
+}
+
+.hint {
+    margin: 10px 0 0;
+    opacity: 0.78;
+    font-size: 13px;
 }

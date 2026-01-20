@@ -1,8 +1,13 @@
+/*
+  Pastel palette:
+  Chosen to look cohesive with the warm background.
+  Duplicates are allowed in the secret code (classic Mastermind rules).
+*/
 const COLORS = [
-    { name: "Deep Purple", hex: "#3B0855" },
-    { name: "Plum", hex: "#852467" },
-    { name: "Soft Coral", hex: "#FD8083" },
-    { name: "Neon Pink", hex: "#EE227D" },
-    { name: "Muted Blue", hex: "#498099" },
-    { name: "Teal", hex: "#30C0B7" }
+    { name: "Lavender", hex: "#8C7BE9" },
+    { name: "Rose", hex: "#FF6FA8" },
+    { name: "Peach", hex: "#FFB28C" },
+    { name: "Butter", hex: "#FFD66B" },
+    { name: "Mint", hex: "#4ED7C3" },
+    { name: "Sky", hex: "#6EB9FF" }
 ];
