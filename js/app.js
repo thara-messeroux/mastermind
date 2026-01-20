@@ -131,9 +131,12 @@ function handlePaletteClick(event) {
         /* guard clause: ignore clicks that are not on a color button */
     }
 
+    if (currentGuess.length >= CODE_LENGTH) {
+        return;
+        /* Safety check: stop adding colors once all 4 slots are filled */
+    }
+
     /* User clicked a color → we remember it → we update the circles on screen */
-    const name = clickedEl.dataset.name;
-    /* read the saved friendly name from the button */
 
     const hex = clickedEl.dataset.hex;
     /* get the hex value saved on the button */
@@ -141,14 +144,13 @@ function handlePaletteClick(event) {
     let selectedColor = null;
     /* we will store the matching color object here */
 
+    /* We are checking each color until we find the one the user clicked, then we stop the loop */
     for (let i = 0; i < COLORS.length; i++) {
         if (COLORS[i].hex === hex) {
             selectedColor = COLORS[i];
             break;
         }
     }
-    /* We are checking each color until we find the one the user clicked, then we stop the loop */
-
 
     /* add the selected color to the current guess */
     currentGuess.push(selectedColor);
