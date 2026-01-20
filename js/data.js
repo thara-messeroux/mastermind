@@ -4,11 +4,12 @@
   These are the colors the player can choose from.
   We use hex colors so the game looks modern and consistent.
 */
+
 const COLORS = [
-    "#3B0855", /* deep purple */
-    "#852467", /* plum */
-    "#FD8083", /* soft coral */
-    "#EE227D", /* neon pink */
-    "#498099", /* muted blue */
-    "#30C0B7"  /* teal */
+    { name: "Deep Purple", hex: "#3B0855" },
+    { name: "Plum", hex: "#852467" },
+    { name: "Soft Coral", hex: "#FD8083" },
+    { name: "Neon Pink", hex: "#EE227D" },
+    { name: "Muted Blue", hex: "#498099" },
+    { name: "Teal", hex: "#30C0B7" }
 ];

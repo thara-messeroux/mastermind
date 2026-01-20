@@ -129,11 +129,16 @@ function renderPalette() {
         buttonEl.setAttribute("type", "button");
         /* This prevents the button from trying to submit a form */
 
-        buttonEl.setAttribute("aria-label", `Choose ${color}`);
-        /* Accessibility: screen readers can describe the button */
+        /*
+        Use the hex value for visuals
+        Use the name for accessibility
+        */
 
-        buttonEl.style.backgroundColor = color;
+        buttonEl.style.backgroundColor = color.hex;
         /* Visually make the button the color */
+
+        buttonEl.setAttribute("aria-label", `Choose ${color.name}`);
+        /* Accessibility: screen readers can describe the button */
 
         paletteEl.appendChild(buttonEl);
         /* Put the button on the screen */
@@ -158,9 +163,6 @@ function init() {
     // Draw the UI based on the state
     renderMessage();     // Show correct message
     renderGuessSlots();  // Draw empty guess circles
-
-    console.log("Game initialized");
-
     renderPalette(); /* draw color buttons based on COLORS data */
 
 }
@@ -172,3 +174,5 @@ function init() {
   Because of `defer` in index.html, the HTML is ready.
 */
 init();
+
+
