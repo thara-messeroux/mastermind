@@ -17,8 +17,10 @@ const MAX_TURNS = 10;  /* the player gets 10 guesses */
 let secretCode;    /* the hidden code the player is trying to guess (later) */
 let currentGuess;  /* the colors the player is building right now */
 let turn;          /* which turn the player is on (0-based) */
-let gameStatus; /* "playing" | "locked" | "won" | "lost" */
+let gameStatus; /* "playing" |"won" | "lost" */
 let isSoundOn;     /* sound on/off (later) */
+let guesses; /* all past guesses, one row per turn */
+
 
 /*------------------------ Cached Element References ------------------------*/
 
@@ -51,11 +53,6 @@ const submitBtnEl = document.querySelector("#submit-guess");
 function renderMessage() {
     if (gameStatus === "playing") {
         messageEl.textContent = `Turn ${turn + 1} of ${MAX_TURNS}: build your guess`;
-        return;
-    }
-
-    if (gameStatus === "locked") {
-        messageEl.textContent = "Guess submitted! (Next: checking feedback)";
         return;
     }
 
@@ -136,7 +133,7 @@ function renderPalette() {
 function handlePaletteClick(event) {
     if (gameStatus !== "playing") {
         return;
-        /* Ignore color clicks once the guess is submitted */
+        /* Safety check: only accept color clicks when the game is in "playing" mode */
     }
 
     const clickedEl = event.target;
@@ -175,20 +172,32 @@ function handlePaletteClick(event) {
     renderGuessSlots();
 }
 
+/* 
+When the player clicks Submit, this function saves the finished guess, 
+moves the game to the next turn, clears the circles, 
+and lets the player start a new guess. 
+*/
 function handleSubmitGuess() {
-    /* User clicks Submit → we lock the current guess */
-
     if (currentGuess.length < CODE_LENGTH) {
         return;
-        /* Safety check: cannot submit until all 4 slots are filled */
+        /* cannot submit until all slots are filled */
     }
 
-    gameStatus = "locked";
-    /* mark this guess as finished */
+    /* save this finished guess */
+    guesses.push(currentGuess);
 
+    /* move to next turn */
+    turn += 1;
+
+    /* reset for the next row */
+    currentGuess = [];
+    gameStatus = "playing";
+
+    /* redraw UI */
     renderMessage();
-    /* update the message so the user knows the guess is locked */
+    renderGuessSlots();
 }
+
 
 /*-------------------------------- Initialization ----------------------------*/
 
@@ -203,6 +212,8 @@ function init() {
     turn = 0;
     gameStatus = "playing";
     isSoundOn = true;
+    guesses = []; /* start with no submitted guesses */
+
 
     /* Draw the UI from the state (State → Render) */
     renderMessage();
