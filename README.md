@@ -50,10 +50,11 @@ A toggle is available to reveal the secret code for testing purposes.
 
 ## Screenshots
 
-| Desktop | Mobile |
-|--------|--------|
-| ![Desktop view of Mastermind](screenshot-desktop.png) | ![Mobile view of Mastermind](screenshot-mobile.png) |
+### Desktop
+![Desktop view of Mastermind](screenshot-desktop.png)
 
+### Mobile
+![Mobile view of Mastermind](screenshot-mobile.png)
 
 ---
 
