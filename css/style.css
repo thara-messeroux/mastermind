@@ -448,3 +448,172 @@ html[data-theme="dark"] .peg.exact {
     background: #000;
     border-color: rgba(255, 255, 255, 0.35);
 }
+
+/* =========================
+   Mobile responsiveness patch
+   Goal:
+   - prevent horizontal overflow / cut-off
+   - stack header + panels cleanly
+   - allow board rows to wrap on small screens
+   ========================= */
+
+/* Fix #1: prevent accidental horizontal scrolling on mobile */
+html,
+body {
+  overflow-x: hidden;
+}
+
+/* Fix #2: allow Grid children to shrink properly
+   Why: Grid items can overflow if their min-width stays "auto"
+   This forces the 2 columns to respect screen width.
+*/
+.layout > * {
+  min-width: 0;
+}
+
+/* Fix #3: on small screens, stack header content instead of squishing */
+@media (max-width: 560px) {
+  .top {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .controls {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  /* Make buttons wrap nicely on mobile */
+  .controls .btn {
+    flex: 1 1 auto;
+  }
+
+  /* Add a little more breathing room */
+  .table {
+    padding: 14px;
+  }
+
+  .panel {
+    padding: 12px;
+  }
+
+  /* Fix #4: allow each board row to wrap
+     Why: "guess slots + peg box" side-by-side can overflow on narrow screens
+     Wrapping keeps them readable instead of cut off.
+  */
+  .board-row {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  /* When wrapped, keep each chunk aligned cleanly */
+  .board-slots {
+    flex: 1 1 100%;
+  }
+
+  .peg-box {
+    flex: 0 0 auto;
+    justify-content: flex-start;
+  }
+
+  /* Fix #5: slightly reduce circle sizes for mobile
+     Why: smaller circles = less overflow = better layout.
+     Only applies on small screens.
+  */
+  .board-slot,
+  .guess-slot {
+    width: 40px;
+    height: 40px;
+  }
+
+  .color-btn {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+
+
+
+/* =========================
+   Mobile responsiveness patch
+   Goal:
+   - prevent horizontal overflow / cut-off
+   - stack header + panels cleanly
+   - allow board rows to wrap on small screens
+   ========================= */
+
+/* Fix #1: prevent accidental horizontal scrolling on mobile */
+html,
+body {
+    overflow-x: hidden;
+}
+
+/* Fix #2: allow Grid children to shrink properly
+   Why: Grid items can overflow if their min-width stays "auto"
+   This forces the 2 columns to respect screen width.
+*/
+.layout>* {
+    min-width: 0;
+}
+
+/* Fix #3: on small screens, stack header content instead of squishing */
+@media (max-width: 560px) {
+    .top {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .controls {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    /* Make buttons wrap nicely on mobile */
+    .controls .btn {
+        flex: 1 1 auto;
+    }
+
+    /* Add a little more breathing room */
+    .table {
+        padding: 14px;
+    }
+
+    .panel {
+        padding: 12px;
+    }
+
+    /* Fix #4: allow each board row to wrap
+     Why: "guess slots + peg box" side-by-side can overflow on narrow screens
+     Wrapping keeps them readable instead of cut off.
+  */
+    .board-row {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    /* When wrapped, keep each chunk aligned cleanly */
+    .board-slots {
+        flex: 1 1 100%;
+    }
+
+    .peg-box {
+        flex: 0 0 auto;
+        justify-content: flex-start;
+    }
+
+    /* Fix #5: slightly reduce circle sizes for mobile
+     Why: smaller circles = less overflow = better layout.
+     Only applies on small screens.
+  */
+    .board-slot,
+    .guess-slot {
+        width: 40px;
+        height: 40px;
+    }
+
+    .color-btn {
+        width: 44px;
+        height: 44px;
+    }
+}
