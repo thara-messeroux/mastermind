@@ -106,16 +106,16 @@ The player attempts to guess a hidden sequence of colors within a limited number
 
 ## Screenshots
 
-### Desktop
+### Desktop (light theme, default)
 ![Desktop view of Mastermind](screenshot-desktop-light-theme.png)
 
-### Mobile
+### Mobile (light theme, default)
 ![Mobile view of Mastermind](screenshot-mobile-light-theme.png)
 
-### Desktop
+### Desktop (dark theme)
 ![Desktop view of Mastermind](screenshot-desktop-dark-theme.png)
 
-### Mobile
+### Mobile (dark theme)
 ![Mobile view of Mastermind](screenshot-mobile-dark-theme.png)
 
 ---
