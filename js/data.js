@@ -1,7 +1,7 @@
 /*
-  Easier mode:
-  - Only 4 colors total
-  - No duplicate colors allowed in the secret code or guesses
+  Data file (simple on purpose):
+  - Game reads from COLORS to build the palette
+  - We use 4 colors to keep the game easier and clear
 */
 const COLORS = [
     { name: "Deep Purple", hex: "#3B0855" },

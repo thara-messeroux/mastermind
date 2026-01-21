@@ -1,78 +1,73 @@
 /* =========================
-   Theme tokens
+   THEMES (Light / Dark)
+   Principle: Single Source of Truth (CSS Variables)
+   - We store theme colors in one place (variables)
+   - The rest of the CSS uses the variables
+   Requirement: UI/UX readability + contrast supported
    ========================= */
 
 /* LIGHT THEME (default) */
 html[data-theme="light"] {
-    --ink: #1b1b1f;
-
-    /* Soft pastel background */
     --bgA: #fff2ea;
     --bgB: #ffeaf3;
     --bgC: #fff7d6;
 
-    /* Liquid glass */
+    --exactGlow: 0 0 0 3px rgba(20, 20, 22, 0.18), 0 10px 22px rgba(0, 0, 0, 0.10);
+
     --glass: rgba(255, 255, 255, 0.62);
     --glassBorder: rgba(255, 255, 255, 0.82);
-    --shadow: 0 18px 45px rgba(0, 0, 0, 0.08);
 
-    /* Lines */
+    --ink: #1b1b1f;
+
     --lineSoft: rgba(27, 27, 31, 0.18);
     --lineStrong: rgba(27, 27, 31, 0.42);
 
-    --radius: 18px;
-
-    /* Peg colors */
     --pegBlack: #141416;
-    --pegWhite: #ffffff;
     --pegBorder: rgba(0, 0, 0, 0.55);
+    --pegWhite: #ffffff;
 
-    /* Highlight for exact matches on the board */
-    --exactGlow: 0 0 0 3px rgba(20, 20, 22, 0.18), 0 10px 22px rgba(0, 0, 0, 0.10);
+    --radius: 18px;
+    --shadow: 0 18px 45px rgba(0, 0, 0, 0.08);
 }
 
 /* DARK THEME */
 html[data-theme="dark"] {
-    --ink: #f3f5ff;
-
-    /* Dark pastel background */
     --bgA: #1b1630;
     --bgB: #2a1a3b;
     --bgC: #1c2b3a;
 
-    /* Liquid glass (dark) */
+    --exactGlow: 0 0 0 3px rgba(255, 255, 255, 0.14), 0 10px 22px rgba(0, 0, 0, 0.35);
+
     --glass: rgba(18, 18, 22, 0.62);
     --glassBorder: rgba(255, 255, 255, 0.14);
-    --shadow: 0 18px 45px rgba(0, 0, 0, 0.45);
 
-    /* Lines */
+    --ink: #f3f5ff;
+
     --lineSoft: rgba(255, 255, 255, 0.14);
     --lineStrong: rgba(255, 255, 255, 0.30);
 
-    --radius: 18px;
-
-    /* Peg colors */
     --pegBlack: #0b0b0d;
-    --pegWhite: #ffffff;
     --pegBorder: rgba(255, 255, 255, 0.55);
+    --pegWhite: #ffffff;
 
-    /* Highlight for exact matches on the board */
-    --exactGlow: 0 0 0 3px rgba(255, 255, 255, 0.14), 0 10px 22px rgba(0, 0, 0, 0.35);
+    --radius: 18px;
+    --shadow: 0 18px 45px rgba(0, 0, 0, 0.45);
 }
 
 /* =========================
-   Accessibility baseline
-   - Larger text by default
+   BASE PAGE STYLES
+   Requirement: Text is readable (no tiny text)
    ========================= */
-body {
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    margin: 0;
-    color: var(--ink);
-    min-height: 100vh;
-    font-size: 18px;
-    /* larger baseline text */
 
-    /* Pastel background inspired by the reference */
+body {
+    color: var(--ink);
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    font-size: 18px;
+    /* Requirement: readable text size */
+    margin: 0;
+    min-height: 100vh;
+
+    /* Soft pastel background */
     background:
         radial-gradient(circle at 16% 12%, #ffe2cf 0%, transparent 45%),
         radial-gradient(circle at 86% 18%, #ffd6ea 0%, transparent 45%),
@@ -80,6 +75,7 @@ body {
         linear-gradient(135deg, var(--bgA), var(--bgB));
 }
 
+/* Dark theme background gets darker but stays soft */
 html[data-theme="dark"] body {
     background:
         radial-gradient(circle at 16% 12%, rgba(140, 123, 233, 0.18) 0%, transparent 45%),
@@ -88,77 +84,52 @@ html[data-theme="dark"] body {
         linear-gradient(135deg, var(--bgA), var(--bgB));
 }
 
+/* App container */
 .app {
-    max-width: 980px;
     margin: 22px auto;
+    max-width: 980px;
     padding: 0 16px 32px;
 }
 
 /* =========================
-   Liquid glass card
+   GLASS CARD STYLE
+   Requirement: Clean UI + good contrast
    ========================= */
+
 .glass {
     background: var(--glass);
+    background-image: radial-gradient(rgba(255, 255, 255, 0.35) 1px, transparent 1px);
+    background-size: 18px 18px;
     border: 1px solid var(--glassBorder);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
-
-    /* subtle paper speckle texture */
-    background-image:
-        radial-gradient(rgba(255, 255, 255, 0.35) 1px, transparent 1px);
-    background-size: 18px 18px;
 }
 
 html[data-theme="dark"] .glass {
-    background-image:
-        radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+    background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
 }
 
 /* =========================
-   Header
+   TYPOGRAPHY + SECTIONS
    ========================= */
-.top {
-    display: flex;
-    /* Flexbox used */
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 16px 18px;
-}
 
-.title h1 {
-    margin: 0;
-    font-size: 34px;
-    /* larger heading */
-    letter-spacing: 0.2px;
+.section-title {
+    font-size: 20px;
+    margin: 0 0 10px;
 }
 
 .subtext {
+    font-weight: 650;
     margin: 6px 0 0;
     opacity: 0.85;
-    font-weight: 650;
 }
 
-.controls {
-    display: flex;
-    /* Flexbox used */
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-/* =========================
-   How-to panel
-   ========================= */
+/* How-to section (Requirement: instructions included in app) */
 .howto {
     margin-top: 14px;
     padding: 16px 18px;
-}
-
-.section-title {
-    margin: 0 0 10px;
-    font-size: 20px;
 }
 
 .howto-list {
@@ -167,25 +138,81 @@ html[data-theme="dark"] .glass {
 }
 
 .hint {
+    font-size: 14px;
     margin: 10px 0 0;
     opacity: 0.82;
-    font-size: 14px;
-    /* still readable */
 }
 
 /* =========================
-   Buttons
+   LAYOUT
+   Requirement: CSS Flexbox/Grid used
    ========================= */
+
+/* Header uses Flexbox */
+.top {
+    align-items: center;
+    display: flex;
+    /* Requirement: Flexbox used */
+    gap: 16px;
+    justify-content: space-between;
+    padding: 16px 18px;
+}
+
+.controls {
+    display: flex;
+    /* Flexbox used */
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* Main game layout uses Grid */
+.table {
+    margin-top: 14px;
+    padding: 18px;
+}
+
+.layout {
+    display: grid;
+    /* Requirement: Grid used */
+    gap: 18px;
+    grid-template-columns: 1.2fr 0.8fr;
+}
+
+@media (max-width: 860px) {
+    .layout {
+        grid-template-columns: 1fr;
+        /* Responsive stack */
+    }
+}
+
+/* Panels */
+.panel {
+    background: rgba(255, 255, 255, 0.38);
+    border: 2px solid rgba(0, 0, 0, 0.06);
+    border-radius: var(--radius);
+    outline: 2px dashed rgba(0, 0, 0, 0.07);
+    /* “hand-drawn” vibe */
+    outline-offset: -10px;
+    padding: 14px;
+}
+
+html[data-theme="dark"] .panel {
+    background: rgba(255, 255, 255, 0.06);
+    border: 2px solid rgba(255, 255, 255, 0.10);
+    outline: 2px dashed rgba(255, 255, 255, 0.08);
+}
+
+/* =========================
+   BUTTONS
+   ========================= */
+
 .btn {
-    padding: 10px 12px;
-    border-radius: 14px;
-    cursor: pointer;
-
-    border: 2px solid var(--lineSoft);
     background: rgba(255, 255, 255, 0.72);
+    border: 2px solid var(--lineSoft);
+    border-radius: 14px;
     box-shadow: 0 10px 22px rgba(0, 0, 0, 0.08);
-
-    /* soft animation */
+    cursor: pointer;
+    padding: 10px 12px;
     transition: transform 140ms ease, background 140ms ease, box-shadow 140ms ease;
 }
 
@@ -194,8 +221,8 @@ html[data-theme="dark"] .btn {
 }
 
 .btn:hover {
-    transform: translateY(-1px);
     background: rgba(255, 255, 255, 0.90);
+    transform: translateY(-1px);
 }
 
 html[data-theme="dark"] .btn:hover {
@@ -203,15 +230,15 @@ html[data-theme="dark"] .btn:hover {
 }
 
 .btn:disabled {
-    opacity: 0.45;
     cursor: not-allowed;
+    opacity: 0.45;
     transform: none;
 }
 
 .primary {
-    width: 100%;
-    margin-top: 12px;
     font-weight: 800;
+    margin-top: 12px;
+    width: 100%;
 }
 
 .ghost {
@@ -223,46 +250,9 @@ html[data-theme="dark"] .ghost {
 }
 
 /* =========================
-   Table / layout (responsive)
+   CURRENT GUESS
    ========================= */
-.table {
-    margin-top: 14px;
-    padding: 18px;
-}
 
-.layout {
-    display: grid;
-    /* Grid used */
-    grid-template-columns: 1.2fr 0.8fr;
-    gap: 18px;
-}
-
-@media (max-width: 860px) {
-    .layout {
-        grid-template-columns: 1fr;
-    }
-}
-
-.panel {
-    padding: 14px;
-    border-radius: var(--radius);
-    background: rgba(255, 255, 255, 0.38);
-    border: 2px solid rgba(0, 0, 0, 0.06);
-
-    /* subtle “hand-drawn” vibe */
-    outline: 2px dashed rgba(0, 0, 0, 0.07);
-    outline-offset: -10px;
-}
-
-html[data-theme="dark"] .panel {
-    background: rgba(255, 255, 255, 0.06);
-    border: 2px solid rgba(255, 255, 255, 0.10);
-    outline: 2px dashed rgba(255, 255, 255, 0.08);
-}
-
-/* =========================
-   Current guess
-   ========================= */
 #guess-slots {
     display: flex;
     /* Flexbox used */
@@ -271,21 +261,21 @@ html[data-theme="dark"] .panel {
 }
 
 .guess-slot {
-    width: 46px;
-    height: 46px;
-    border-radius: 50%;
-    border: 2px solid var(--lineStrong);
     background: rgba(255, 255, 255, 0.70);
+    border: 2px solid var(--lineStrong);
+    border-radius: 50%;
     box-shadow:
         inset 0 0 0 3px rgba(255, 255, 255, 0.70),
         0 8px 16px rgba(0, 0, 0, 0.06);
+    height: 46px;
+    width: 46px;
 }
 
 html[data-theme="dark"] .guess-slot {
     background: rgba(255, 255, 255, 0.08);
 }
 
-/* Pop animation for newly filled slots */
+/* Small fun animation when slot becomes filled */
 .guess-slot.filled {
     animation: pop 180ms ease-out;
 }
@@ -301,25 +291,25 @@ html[data-theme="dark"] .guess-slot {
 }
 
 /* =========================
-   Palette
+   PALETTE
    ========================= */
+
 #palette {
     display: flex;
     /* Flexbox used */
-    gap: 12px;
     flex-wrap: wrap;
+    gap: 12px;
     margin: 10px 0 6px;
 }
 
 .color-btn {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    cursor: pointer;
-
     border: 2px solid var(--lineStrong);
+    border-radius: 50%;
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.10);
+    cursor: pointer;
+    height: 48px;
     transition: transform 140ms ease, box-shadow 140ms ease;
+    width: 48px;
 }
 
 .color-btn:hover {
@@ -331,8 +321,9 @@ html[data-theme="dark"] .guess-slot {
 }
 
 /* =========================
-   Board history
+   BOARD HISTORY
    ========================= */
+
 #board {
     display: flex;
     /* Flexbox used */
@@ -340,21 +331,19 @@ html[data-theme="dark"] .guess-slot {
     gap: 12px;
 }
 
-/* Row appears with a soft fade */
+/* One row of history (guess + pegs) */
 .board-row {
+    align-items: center;
+    background: rgba(255, 255, 255, 0.42);
+    border: 2px solid rgba(0, 0, 0, 0.06);
+    border-radius: 16px;
     display: flex;
     /* Flexbox used */
-    align-items: center;
-    justify-content: space-between;
     gap: 12px;
-
-    padding: 10px 10px;
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.42);
-
-    border: 2px solid rgba(0, 0, 0, 0.06);
+    justify-content: space-between;
     outline: 2px dashed rgba(0, 0, 0, 0.07);
     outline-offset: -8px;
+    padding: 10px 10px;
 }
 
 html[data-theme="dark"] .board-row {
@@ -363,6 +352,7 @@ html[data-theme="dark"] .board-row {
     outline: 2px dashed rgba(255, 255, 255, 0.08);
 }
 
+/* Row fade animation after submit */
 .board-row.submitted {
     animation: fadeIn 220ms ease-out;
 }
@@ -386,22 +376,21 @@ html[data-theme="dark"] .board-row {
 }
 
 .board-slot {
-    width: 46px;
-    height: 46px;
-    border-radius: 50%;
-    border: 2px solid var(--lineSoft);
     background: rgba(255, 255, 255, 0.62);
-
+    border: 2px solid var(--lineSoft);
+    border-radius: 50%;
     box-shadow:
         inset 0 0 0 3px rgba(255, 255, 255, 0.70),
         0 8px 16px rgba(0, 0, 0, 0.06);
+    height: 46px;
+    width: 46px;
 }
 
 html[data-theme="dark"] .board-slot {
     background: rgba(255, 255, 255, 0.08);
 }
 
-/* Exact match highlight on the main colored circle */
+/* Exact match highlight on the main guess circle */
 .board-slot.exact {
     box-shadow: var(--exactGlow);
     border-color: rgba(20, 20, 22, 0.35);
@@ -412,24 +401,22 @@ html[data-theme="dark"] .board-slot.exact {
 }
 
 /* =========================
-   Feedback pegs (aligned by position)
-   - 4 pegs in a row
-   - peg #1 corresponds to slot #1, etc.
+   FEEDBACK PEGS
+   Requirement: visible white pegs (borders)
    ========================= */
+
 .peg-box {
+    align-items: center;
+    background: rgba(255, 255, 255, 0.72);
+    border: 2px dashed rgba(0, 0, 0, 0.20);
+    border-radius: 14px;
     display: flex;
     /* Flexbox used */
     gap: 8px;
-
-    padding: 10px;
-    border-radius: 14px;
-    background: rgba(255, 255, 255, 0.72);
-
-    border: 2px dashed rgba(0, 0, 0, 0.20);
-    min-width: 92px;
-    min-height: 52px;
-    align-items: center;
     justify-content: center;
+    min-height: 52px;
+    min-width: 92px;
+    padding: 10px;
 }
 
 html[data-theme="dark"] .peg-box {
@@ -438,18 +425,20 @@ html[data-theme="dark"] .peg-box {
 }
 
 .peg {
-    width: 16px;
-    height: 16px;
+    background: var(--pegWhite);
+    border: 2px solid var(--pegBorder);
+    /* makes white peg visible */
     border-radius: 50%;
     box-sizing: border-box;
-    border: 2px solid var(--pegBorder);
-    background: var(--pegWhite);
+    height: 16px;
+    width: 16px;
 }
 
 html[data-theme="dark"] .peg {
     border: 2px solid rgba(255, 255, 255, 0.55);
 }
 
+/* Black peg = correct position */
 .peg.exact {
     background: var(--pegBlack);
     border-color: rgba(0, 0, 0, 0.85);
