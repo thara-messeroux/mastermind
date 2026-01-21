@@ -30,6 +30,62 @@ A toggle is available to reveal the secret code for testing purposes.
 
 ---
 
+## Project Planning
+
+### Game Choice
+**Mastermind**
+
+This project is a browser-based version of the classic Mastermind code-breaking game.  
+The player attempts to guess a hidden sequence of colors within a limited number of turns using logic and feedback.
+
+---
+
+### Gameplay Overview (Pseudocode)
+
+**START GAME**
+- Generate a secret code made of 4 colors
+- Set turn counter to 0
+- Set game status to “playing”
+
+**PLAYER BUILDS GUESS**
+- Player clicks colors to build a guess of 4 colors
+- Display the current guess on the screen
+
+**SUBMIT GUESS**
+- Compare the guess to the secret code
+- Calculate feedback:
+  - Exact matches (correct color in the correct position)
+  - Color-only matches (correct color in the wrong position)
+- Display feedback to the player
+- Increase the turn count
+
+**CHECK GAME STATE**
+- If all 4 positions are exact matches:
+  - Player wins
+  - Display a win message
+- Else if the maximum number of turns is reached:
+  - Player loses
+  - Display a loss message and reveal the secret code
+- Otherwise:
+  - Allow the player to make another guess
+
+**RESET GAME**
+- Clear all guesses and feedback
+- Generate a new secret code
+- Restart the game
+
+---
+
+### Additional Planning Requirements
+
+**Audio**
+- A sound plays when a guess is submitted
+- A sound plays when the player wins
+- A sound plays when the player loses
+- Audio can be toggled on or off by the user
+
+---
+
 ## Features
 - Win and loss conditions with visual and audio feedback
 - Accessible UI with high-contrast colors and readable text
