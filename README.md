@@ -48,8 +48,11 @@ A toggle is available to reveal the secret code for testing purposes.
 
 ---
 
-## Screenshot
-![Mastermind game screenshot](screenshot.png)
+## Screenshots
+
+| Desktop | Mobile |
+|--------|--------|
+| ![Desktop view of Mastermind](screenshot-desktop.png) | ![Mobile view of Mastermind](screenshot-mobile.png) |
 
 
 ---
