@@ -1,31 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mastermind</title>
 
-    <!-- Styles first -->
     <link rel="stylesheet" href="./css/style.css" />
-
-    <!-- Data (COLORS) must load before app.js -->
     <script defer src="./js/data.js"></script>
     <script defer src="./js/app.js"></script>
 </head>
 
 <body>
-    <!-- 
-    Main app wrapper:
-    - Keeps content centered
-    - Creates the "board game" layout area
-  -->
     <main class="app">
-        <!-- 
-      Header:
-      - Shows title + game message
-      - Shows small controls (reset/sound)
-    -->
+        <!-- Header: title + status + controls -->
         <header class="top glass">
             <div class="title">
                 <h1>Mastermind</h1>
@@ -35,15 +23,34 @@
             <div class="controls">
                 <button id="reset" type="button" class="btn">Reset</button>
                 <button id="sound-toggle" type="button" class="btn">Sound: On</button>
+                <button id="theme-toggle" type="button" class="btn">Theme: Light</button>
+                <button id="reveal-code" type="button" class="btn ghost">Reveal Code</button>
             </div>
         </header>
 
-        <!-- 
-      "Table" surface:
-      - Two panels using CSS Grid
-      - Left: board history
-      - Right: current guess + palette + submit
-     -->
+        <!-- Simple instructions -->
+        <section class="howto glass" aria-label="How to play">
+            <h2 class="section-title">How to play</h2>
+            <ol class="howto-list">
+                <li>Pick <strong>4 different colors</strong> (no duplicates).</li>
+                <li>Click <strong>Submit Guess</strong>.</li>
+                <li>Feedback pegs are aligned by position:
+                    <ul>
+                        <li><strong>Black</strong> = that position is correct.</li>
+                        <li><strong>White</strong> = that position is not correct.</li>
+                    </ul>
+                </li>
+                <li>Win by getting <strong>4 black pegs</strong>.</li>
+            </ol>
+            <p class="hint">
+                Testing: click <strong>Reveal Code</strong> or press <strong>C</strong>.
+            </p>
+
+            <!-- Code reveal output (toggle show/hide) -->
+            <p id="code-reveal" class="hint" aria-live="polite"></p>
+        </section>
+
+        <!-- Game surface -->
         <section class="table glass">
             <div class="layout">
                 <section class="panel">
@@ -58,17 +65,12 @@
                     <h2 class="section-title">Colors</h2>
                     <div id="palette"></div>
 
-                    <!-- 
-                        Submit is placed under Colors:
-                        - More natural flow: pick colors -> submit
-                    -->
                     <button id="submit-guess" type="button" class="btn primary">
                         Submit Guess
                     </button>
 
                     <p class="hint">
-                        Pick 4 colors, then submit.
-                        (Press "C" to reveal the secret code for testing.)
+                        Tip: duplicates are not allowed in a guess.
                     </p>
                 </section>
             </div>

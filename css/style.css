@@ -1,7 +1,9 @@
 /* =========================
-   Theme tokens (easy edits)
+   Theme tokens
    ========================= */
-:root {
+
+/* LIGHT THEME (default) */
+html[data-theme="light"] {
     --ink: #1b1b1f;
 
     /* Soft pastel background */
@@ -11,12 +13,12 @@
 
     /* Liquid glass */
     --glass: rgba(255, 255, 255, 0.62);
-    --glassBorder: rgba(255, 255, 255, 0.80);
+    --glassBorder: rgba(255, 255, 255, 0.82);
     --shadow: 0 18px 45px rgba(0, 0, 0, 0.08);
 
-    /* "Hand-drawn" line colors */
+    /* Lines */
     --lineSoft: rgba(27, 27, 31, 0.18);
-    --lineStrong: rgba(27, 27, 31, 0.38);
+    --lineStrong: rgba(27, 27, 31, 0.42);
 
     --radius: 18px;
 
@@ -24,18 +26,53 @@
     --pegBlack: #141416;
     --pegWhite: #ffffff;
     --pegBorder: rgba(0, 0, 0, 0.55);
+
+    /* Highlight for exact matches on the board */
+    --exactGlow: 0 0 0 3px rgba(20, 20, 22, 0.18), 0 10px 22px rgba(0, 0, 0, 0.10);
+}
+
+/* DARK THEME */
+html[data-theme="dark"] {
+    --ink: #f3f5ff;
+
+    /* Dark pastel background */
+    --bgA: #1b1630;
+    --bgB: #2a1a3b;
+    --bgC: #1c2b3a;
+
+    /* Liquid glass (dark) */
+    --glass: rgba(18, 18, 22, 0.62);
+    --glassBorder: rgba(255, 255, 255, 0.14);
+    --shadow: 0 18px 45px rgba(0, 0, 0, 0.45);
+
+    /* Lines */
+    --lineSoft: rgba(255, 255, 255, 0.14);
+    --lineStrong: rgba(255, 255, 255, 0.30);
+
+    --radius: 18px;
+
+    /* Peg colors */
+    --pegBlack: #0b0b0d;
+    --pegWhite: #ffffff;
+    --pegBorder: rgba(255, 255, 255, 0.55);
+
+    /* Highlight for exact matches on the board */
+    --exactGlow: 0 0 0 3px rgba(255, 255, 255, 0.14), 0 10px 22px rgba(0, 0, 0, 0.35);
 }
 
 /* =========================
-   Page background + centering
+   Accessibility baseline
+   - Larger text by default
    ========================= */
 body {
     font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     margin: 0;
     color: var(--ink);
     min-height: 100vh;
+    font-size: 18px;
+    /* larger baseline text */
 
-    /* Pastel "cartoon" wash inspired by the reference */
+    /* Pastel background inspired by the reference */
     background:
         radial-gradient(circle at 16% 12%, #ffe2cf 0%, transparent 45%),
         radial-gradient(circle at 86% 18%, #ffd6ea 0%, transparent 45%),
@@ -43,15 +80,22 @@ body {
         linear-gradient(135deg, var(--bgA), var(--bgB));
 }
 
-/* App container: centers everything */
+html[data-theme="dark"] body {
+    background:
+        radial-gradient(circle at 16% 12%, rgba(140, 123, 233, 0.18) 0%, transparent 45%),
+        radial-gradient(circle at 86% 18%, rgba(255, 111, 168, 0.16) 0%, transparent 45%),
+        radial-gradient(circle at 30% 90%, rgba(78, 215, 195, 0.12) 0%, transparent 45%),
+        linear-gradient(135deg, var(--bgA), var(--bgB));
+}
+
 .app {
     max-width: 980px;
-    margin: 28px auto;
-    padding: 0 16px 30px;
+    margin: 22px auto;
+    padding: 0 16px 32px;
 }
 
 /* =========================
-   Liquid glass card style
+   Liquid glass card
    ========================= */
 .glass {
     background: var(--glass);
@@ -61,10 +105,15 @@ body {
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
 
-    /* subtle paper speckle */
+    /* subtle paper speckle texture */
     background-image:
         radial-gradient(rgba(255, 255, 255, 0.35) 1px, transparent 1px);
     background-size: 18px 18px;
+}
+
+html[data-theme="dark"] .glass {
+    background-image:
+        radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
 }
 
 /* =========================
@@ -81,14 +130,15 @@ body {
 
 .title h1 {
     margin: 0;
-    font-size: 32px;
+    font-size: 34px;
+    /* larger heading */
     letter-spacing: 0.2px;
 }
 
 .subtext {
     margin: 6px 0 0;
     opacity: 0.85;
-    font-weight: 600;
+    font-weight: 650;
 }
 
 .controls {
@@ -99,22 +149,57 @@ body {
 }
 
 /* =========================
+   How-to panel
+   ========================= */
+.howto {
+    margin-top: 14px;
+    padding: 16px 18px;
+}
+
+.section-title {
+    margin: 0 0 10px;
+    font-size: 20px;
+}
+
+.howto-list {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.hint {
+    margin: 10px 0 0;
+    opacity: 0.82;
+    font-size: 14px;
+    /* still readable */
+}
+
+/* =========================
    Buttons
    ========================= */
 .btn {
     padding: 10px 12px;
     border-radius: 14px;
     cursor: pointer;
-    transition: transform 120ms ease, background 120ms ease;
 
     border: 2px solid var(--lineSoft);
     background: rgba(255, 255, 255, 0.72);
     box-shadow: 0 10px 22px rgba(0, 0, 0, 0.08);
+
+    /* soft animation */
+    transition: transform 140ms ease, background 140ms ease, box-shadow 140ms ease;
+}
+
+html[data-theme="dark"] .btn {
+    background: rgba(255, 255, 255, 0.08);
 }
 
 .btn:hover {
     transform: translateY(-1px);
     background: rgba(255, 255, 255, 0.90);
+}
+
+html[data-theme="dark"] .btn:hover {
+    background: rgba(255, 255, 255, 0.14);
 }
 
 .btn:disabled {
@@ -127,18 +212,24 @@ body {
     width: 100%;
     margin-top: 12px;
     font-weight: 800;
-    border: 2px solid var(--lineSoft);
+}
+
+.ghost {
+    background: rgba(255, 255, 255, 0.55);
+}
+
+html[data-theme="dark"] .ghost {
+    background: rgba(255, 255, 255, 0.10);
 }
 
 /* =========================
-   Table layout
+   Table / layout (responsive)
    ========================= */
 .table {
     margin-top: 14px;
     padding: 18px;
 }
 
-/* Two-column layout using Grid */
 .layout {
     display: grid;
     /* Grid used */
@@ -146,7 +237,6 @@ body {
     gap: 18px;
 }
 
-/* Responsive stack */
 @media (max-width: 860px) {
     .layout {
         grid-template-columns: 1fr;
@@ -159,14 +249,15 @@ body {
     background: rgba(255, 255, 255, 0.38);
     border: 2px solid rgba(0, 0, 0, 0.06);
 
-    /* subtle sketch outline */
+    /* subtle “hand-drawn” vibe */
     outline: 2px dashed rgba(0, 0, 0, 0.07);
     outline-offset: -10px;
 }
 
-.section-title {
-    margin: 0 0 10px;
-    font-size: 18px;
+html[data-theme="dark"] .panel {
+    background: rgba(255, 255, 255, 0.06);
+    border: 2px solid rgba(255, 255, 255, 0.10);
+    outline: 2px dashed rgba(255, 255, 255, 0.08);
 }
 
 /* =========================
@@ -180,15 +271,33 @@ body {
 }
 
 .guess-slot {
-    width: 44px;
-    height: 44px;
+    width: 46px;
+    height: 46px;
     border-radius: 50%;
     border: 2px solid var(--lineStrong);
     background: rgba(255, 255, 255, 0.70);
-
     box-shadow:
         inset 0 0 0 3px rgba(255, 255, 255, 0.70),
         0 8px 16px rgba(0, 0, 0, 0.06);
+}
+
+html[data-theme="dark"] .guess-slot {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* Pop animation for newly filled slots */
+.guess-slot.filled {
+    animation: pop 180ms ease-out;
+}
+
+@keyframes pop {
+    from {
+        transform: scale(0.92);
+    }
+
+    to {
+        transform: scale(1);
+    }
 }
 
 /* =========================
@@ -203,18 +312,22 @@ body {
 }
 
 .color-btn {
-    width: 46px;
-    height: 46px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     cursor: pointer;
 
     border: 2px solid var(--lineStrong);
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.10);
-    transition: transform 120ms ease;
+    transition: transform 140ms ease, box-shadow 140ms ease;
 }
 
 .color-btn:hover {
     transform: translateY(-2px) scale(1.03);
+}
+
+.color-btn:active {
+    transform: translateY(0) scale(0.98);
 }
 
 /* =========================
@@ -227,6 +340,7 @@ body {
     gap: 12px;
 }
 
+/* Row appears with a soft fade */
 .board-row {
     display: flex;
     /* Flexbox used */
@@ -243,6 +357,28 @@ body {
     outline-offset: -8px;
 }
 
+html[data-theme="dark"] .board-row {
+    background: rgba(255, 255, 255, 0.06);
+    border: 2px solid rgba(255, 255, 255, 0.10);
+    outline: 2px dashed rgba(255, 255, 255, 0.08);
+}
+
+.board-row.submitted {
+    animation: fadeIn 220ms ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0.5;
+        transform: translateY(2px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .board-slots {
     display: flex;
     /* Flexbox used */
@@ -250,8 +386,8 @@ body {
 }
 
 .board-slot {
-    width: 44px;
-    height: 44px;
+    width: 46px;
+    height: 46px;
     border-radius: 50%;
     border: 2px solid var(--lineSoft);
     background: rgba(255, 255, 255, 0.62);
@@ -261,32 +397,57 @@ body {
         0 8px 16px rgba(0, 0, 0, 0.06);
 }
 
+html[data-theme="dark"] .board-slot {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* Exact match highlight on the main colored circle */
+.board-slot.exact {
+    box-shadow: var(--exactGlow);
+    border-color: rgba(20, 20, 22, 0.35);
+}
+
+html[data-theme="dark"] .board-slot.exact {
+    border-color: rgba(255, 255, 255, 0.35);
+}
+
 /* =========================
-   Feedback pegs (2x2 = up to 4 pegs)
+   Feedback pegs (aligned by position)
+   - 4 pegs in a row
+   - peg #1 corresponds to slot #1, etc.
    ========================= */
 .peg-box {
-    display: grid;
-    /* Grid used */
-    grid-template-columns: repeat(2, 14px);
-    grid-auto-rows: 14px;
-    gap: 7px;
+    display: flex;
+    /* Flexbox used */
+    gap: 8px;
 
     padding: 10px;
     border-radius: 14px;
-    background: rgba(255, 255, 255, 0.70);
+    background: rgba(255, 255, 255, 0.72);
 
     border: 2px dashed rgba(0, 0, 0, 0.20);
-    min-width: 52px;
+    min-width: 92px;
     min-height: 52px;
+    align-items: center;
+    justify-content: center;
+}
+
+html[data-theme="dark"] .peg-box {
+    background: rgba(255, 255, 255, 0.08);
+    border: 2px dashed rgba(255, 255, 255, 0.12);
 }
 
 .peg {
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
     box-sizing: border-box;
     border: 2px solid var(--pegBorder);
-    /* makes white pegs visible */
+    background: var(--pegWhite);
+}
+
+html[data-theme="dark"] .peg {
+    border: 2px solid rgba(255, 255, 255, 0.55);
 }
 
 .peg.exact {
@@ -294,13 +455,7 @@ body {
     border-color: rgba(0, 0, 0, 0.85);
 }
 
-.peg.color-only {
-    background: var(--pegWhite);
-    border-color: rgba(0, 0, 0, 0.55);
-}
-
-.hint {
-    margin: 10px 0 0;
-    opacity: 0.78;
-    font-size: 13px;
+html[data-theme="dark"] .peg.exact {
+    background: #000;
+    border-color: rgba(255, 255, 255, 0.35);
 }

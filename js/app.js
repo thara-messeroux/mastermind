@@ -1,7 +1,9 @@
 /*-------------------------------- Constants --------------------------------*/
 
 /*
-  Game rules (do not change during a game).
+  Game rules:
+  - CODE_LENGTH = how many slots are in the secret code
+  - MAX_TURNS = how many guesses the player gets
 */
 const CODE_LENGTH = 4;
 const MAX_TURNS = 10;
@@ -10,55 +12,72 @@ const MAX_TURNS = 10;
 
 /*
   Single Source of Truth:
-  - These variables represent the entire game state.
-  - The UI is drawn from state.
-  - Events update state, then we re-render.
+  - These variables describe the entire game at any moment.
+  - The UI is always re-drawn from this state.
+  - User events update state, then we re-render.
 */
-let secretCode;
-let currentGuess;
-let turn;
-let gameStatus;   /* "playing" | "won" | "lost" */
-let isSoundOn;
-let guesses;
-let feedbacks;
+let secretCode;       // the hidden code the player must guess
+let currentGuess;     // the guess being built right now
+let turn;             // which turn we are on (0-based)
+let gameStatus;       // "playing" | "won" | "lost"
+let isSoundOn;        // sound toggle
+let guesses;          // array of past guesses (each guess is an array of colors)
+let feedbacks;        // array of feedback arrays (each feedback is 4 booleans)
+let theme;            // "light" | "dark"
+let isCodeVisible;    // whether the secret code is currently shown
 
 /*------------------------ Cached Element References ------------------------*/
 
-/*
-  Cache DOM references once:
-  - Keeps code faster and cleaner
-  - Avoids repeating querySelector
-*/
 const messageEl = document.querySelector("#message");
 const guessSlotsEl = document.querySelector("#guess-slots");
 const paletteEl = document.querySelector("#palette");
 const submitBtnEl = document.querySelector("#submit-guess");
 const boardEl = document.querySelector("#board");
+
 const resetBtnEl = document.querySelector("#reset");
 const soundToggleEl = document.querySelector("#sound-toggle");
+const themeToggleEl = document.querySelector("#theme-toggle");
+const revealCodeBtnEl = document.querySelector("#reveal-code");
+const codeRevealEl = document.querySelector("#code-reveal");
 
 /*-------------------------------- Audio Helpers ----------------------------*/
 
 /*
-  Small sound effects without external audio files:
-  - Uses Web Audio API oscillator + gain
-  - Different tones for click/submit/win/lose
+  Requirement note:
+  - We keep short sound effects (click/submit/win/lose).
+  - We removed background noise completely (no loops).
 */
+
 let audioCtx = null;
 
-function playTone(freq, ms) {
-    if (!isSoundOn) return;
-
+/*
+  Ensures we have an AudioContext.
+  Browsers require user interaction before sound can play.
+*/
+function ensureAudio() {
     if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
+}
+
+/*
+  Plays a short tone.
+  - freq = pitch (Hz)
+  - ms = duration
+  - volume = loudness (keep small)
+  - type = waveform shape
+*/
+function playTone(freq, ms, volume = 0.06, type = "sine") {
+    if (!isSoundOn) return;
+
+    ensureAudio();
 
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
 
-    osc.type = "sine";
+    osc.type = type;
     osc.frequency.value = freq;
-    gain.gain.value = 0.06;
+    gain.gain.value = volume;
 
     osc.connect(gain);
     gain.connect(audioCtx.destination);
@@ -67,83 +86,57 @@ function playTone(freq, ms) {
     setTimeout(() => osc.stop(), ms);
 }
 
-function playClickSound() { playTone(560, 55); }
-function playSubmitSound() { playTone(380, 90); }
+/* Small UI sounds */
+function playClickSound() { playTone(620, 50, 0.04, "triangle"); }
+function playSubmitSound() { playTone(420, 90, 0.05, "sine"); }
 
+/*
+  More playful win sound:
+  A tiny “jingle” (3 quick notes).
+*/
 function playWinSound() {
-    playTone(660, 120);
-    setTimeout(() => playTone(880, 140), 140);
+    playTone(660, 90, 0.06, "sine");   // note 1
+    setTimeout(() => playTone(880, 90, 0.06, "sine"), 90);   // note 2
+    setTimeout(() => playTone(990, 120, 0.06, "sine"), 180); // note 3
 }
 
+/* Lose sound: a short downward sound */
 function playLoseSound() {
-    playTone(260, 140);
-    setTimeout(() => playTone(180, 180), 160);
+    playTone(260, 120, 0.06, "sine");
+    setTimeout(() => playTone(180, 160, 0.06, "sine"), 130);
 }
 
 /*-------------------------------- Helper Functions --------------------------*/
 
 /*
-  Create a new secret code:
-  - 4 positions
-  - each position randomly picks from COLORS
-  - duplicates are allowed (classic Mastermind rules)
+  Generate a secret code with NO duplicates.
+  This is “easier mode” because every color is unique.
 */
-function getRandomCode() {
-    const code = [];
+function getRandomCodeNoDuplicates() {
+    const pool = [...COLORS];
 
-    for (let i = 0; i < CODE_LENGTH; i += 1) {
-        const randomIndex = Math.floor(Math.random() * COLORS.length);
-        code.push(COLORS[randomIndex]);
+    /* Fisher-Yates shuffle (safe random shuffle) */
+    for (let i = pool.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [pool[i], pool[j]] = [pool[j], pool[i]];
     }
 
-    return code;
+    return pool.slice(0, CODE_LENGTH);
 }
 
 /*
-  Scoring function (feedback pegs):
-
-  exact:
-  - correct color AND correct position
-
-  colorOnly:
-  - correct color but wrong position
-
-  Key idea:
-  - We avoid double-counting by marking used positions.
+  Feedback aligned by position:
+  - feedback[i] is true only if guess[i] matches code[i]
+  - This is fast and easy to understand visually.
 */
-function scoreGuess(guess, code) {
-    let exact = 0;
-    let colorOnly = 0;
+function getPositionFeedback(guess, code) {
+    const feedback = [];
 
-    const usedGuess = Array(CODE_LENGTH).fill(false);
-    const usedCode = Array(CODE_LENGTH).fill(false);
-
-    /* Pass 1: exact matches */
     for (let i = 0; i < CODE_LENGTH; i += 1) {
-        if (guess[i].hex === code[i].hex) {
-            exact += 1;
-            usedGuess[i] = true;
-            usedCode[i] = true;
-        }
+        feedback.push(guess[i].hex === code[i].hex);
     }
 
-    /* Pass 2: color-only matches */
-    for (let i = 0; i < CODE_LENGTH; i += 1) {
-        if (usedGuess[i]) continue;
-
-        for (let j = 0; j < CODE_LENGTH; j += 1) {
-            if (usedCode[j]) continue;
-
-            if (guess[i].hex === code[j].hex) {
-                colorOnly += 1;
-                usedGuess[i] = true;
-                usedCode[j] = true;
-                break;
-            }
-        }
-    }
-
-    return { exact, colorOnly };
+    return feedback;
 }
 
 /*-------------------------------- Render Functions --------------------------*/
@@ -151,8 +144,9 @@ function scoreGuess(guess, code) {
 /*
   Render pattern:
   - Render functions read state and draw UI.
-  - Render functions do not change state.
+  - Render functions do NOT change state.
 */
+
 function renderMessage() {
     if (gameStatus === "playing") {
         messageEl.textContent = `Turn ${turn + 1} of ${MAX_TURNS}: build your guess`;
@@ -179,6 +173,7 @@ function renderGuessSlots() {
         const selectedColor = currentGuess[i];
         if (selectedColor) {
             slotEl.style.backgroundColor = selectedColor.hex;
+            slotEl.classList.add("filled");
         }
 
         guessSlotsEl.appendChild(slotEl);
@@ -203,18 +198,19 @@ function renderPalette() {
     }
 }
 
-/*
-  Board rendering:
-  - MAX_TURNS rows
-  - each row shows 4 guess circles
-  - each row shows a 2x2 peg box (up to 4 pegs)
-*/
 function renderBoard() {
     boardEl.innerHTML = "";
 
     for (let row = 0; row < MAX_TURNS; row += 1) {
         const rowEl = document.createElement("div");
         rowEl.classList.add("board-row");
+
+        const guessForRow = guesses[row];
+        const feedbackForRow = feedbacks[row];
+
+        if (guessForRow) {
+            rowEl.classList.add("submitted");
+        }
 
         const slotsWrapEl = document.createElement("div");
         slotsWrapEl.classList.add("board-slots");
@@ -223,11 +219,13 @@ function renderBoard() {
             const slotEl = document.createElement("div");
             slotEl.classList.add("board-slot");
 
-            const guessForRow = guesses[row];
-            const selectedColor = guessForRow ? guessForRow[col] : null;
+            if (guessForRow) {
+                slotEl.style.backgroundColor = guessForRow[col].hex;
 
-            if (selectedColor) {
-                slotEl.style.backgroundColor = selectedColor.hex;
+                /* Visual highlight for exact matches */
+                if (feedbackForRow && feedbackForRow[col] === true) {
+                    slotEl.classList.add("exact");
+                }
             }
 
             slotsWrapEl.appendChild(slotEl);
@@ -236,19 +234,16 @@ function renderBoard() {
         const pegBoxEl = document.createElement("div");
         pegBoxEl.classList.add("peg-box");
 
-        const fb = feedbacks[row];
-        if (fb) {
-            for (let i = 0; i < fb.exact; i += 1) {
-                const peg = document.createElement("div");
-                peg.classList.add("peg", "exact");
-                pegBoxEl.appendChild(peg);
+        for (let i = 0; i < CODE_LENGTH; i += 1) {
+            const pegEl = document.createElement("div");
+            pegEl.classList.add("peg");
+
+            /* Black peg if correct for that exact position */
+            if (feedbackForRow && feedbackForRow[i] === true) {
+                pegEl.classList.add("exact");
             }
 
-            for (let i = 0; i < fb.colorOnly; i += 1) {
-                const peg = document.createElement("div");
-                peg.classList.add("peg", "color-only");
-                pegBoxEl.appendChild(peg);
-            }
+            pegBoxEl.appendChild(pegEl);
         }
 
         rowEl.appendChild(slotsWrapEl);
@@ -258,9 +253,8 @@ function renderBoard() {
 }
 
 /*
-  Button state:
-  - Submit is disabled until the guess has 4 colors
-  - Submit is disabled when the game ends
+  Submit button rules:
+  - enabled only when guess has 4 colors AND game is still playing
 */
 function renderSubmitButton() {
     submitBtnEl.disabled =
@@ -271,10 +265,39 @@ function renderSoundToggle() {
     soundToggleEl.textContent = isSoundOn ? "Sound: On" : "Sound: Off";
 }
 
+/*
+  Theme rendering:
+  - Uses data-theme attribute in HTML
+  - CSS reads that to swap colors
+*/
+function renderThemeToggle() {
+    document.documentElement.setAttribute("data-theme", theme);
+    themeToggleEl.textContent = theme === "light" ? "Theme: Light" : "Theme: Dark";
+}
+
+/*
+  Reveal code toggle UI:
+  - When visible: show names in the how-to area
+  - When hidden: clear the text
+  - Also update button label so user knows the state
+*/
+function renderCodeReveal() {
+    if (isCodeVisible) {
+        const names = secretCode.map(c => c.name).join(", ");
+        codeRevealEl.textContent = `Secret code: ${names}`;
+        revealCodeBtnEl.textContent = "Hide Code";
+    } else {
+        codeRevealEl.textContent = "";
+        revealCodeBtnEl.textContent = "Reveal Code";
+    }
+}
+
 /*-------------------------------- Event Handlers ----------------------------*/
 
 /*
-  Event -> Update State -> Render
+  Palette click rules:
+  - No duplicates allowed in a guess
+  - Once guess has 4 colors, ignore extra clicks
 */
 function handlePaletteClick(event) {
     if (gameStatus !== "playing") return;
@@ -282,18 +305,15 @@ function handlePaletteClick(event) {
     const clickedEl = event.target;
     if (!clickedEl.classList.contains("color-btn")) return;
 
-    if (currentGuess.length >= CODE_LENGTH) return;
-
     const hex = clickedEl.dataset.hex;
 
-    let selectedColor = null;
-    for (let i = 0; i < COLORS.length; i += 1) {
-        if (COLORS[i].hex === hex) {
-            selectedColor = COLORS[i];
-            break;
-        }
-    }
+    /* Stop duplicates in the SAME guess */
+    const alreadyPicked = currentGuess.some(c => c.hex === hex);
+    if (alreadyPicked) return;
 
+    if (currentGuess.length >= CODE_LENGTH) return;
+
+    const selectedColor = COLORS.find(c => c.hex === hex);
     if (!selectedColor) return;
 
     currentGuess.push(selectedColor);
@@ -307,12 +327,14 @@ function handleSubmitGuess() {
     if (gameStatus !== "playing") return;
     if (currentGuess.length < CODE_LENGTH) return;
 
-    const feedback = scoreGuess(currentGuess, secretCode);
+    const feedback = getPositionFeedback(currentGuess, secretCode);
 
     guesses.push([...currentGuess]);
     feedbacks.push(feedback);
 
-    if (feedback.exact === CODE_LENGTH) {
+    const allCorrect = feedback.every(v => v === true);
+
+    if (allCorrect) {
         gameStatus = "won";
         playWinSound();
     } else {
@@ -341,37 +363,56 @@ function handleSoundToggle() {
     isSoundOn = !isSoundOn;
     renderSoundToggle();
 
-    if (isSoundOn) playTone(520, 80);
+    /* Optional tiny confirmation beep when turning sound ON */
+    if (isSoundOn) playTone(520, 70, 0.04, "sine");
+}
+
+function handleThemeToggle() {
+    theme = theme === "light" ? "dark" : "light";
+    renderThemeToggle();
 }
 
 /*
-  Testing shortcut:
-  - Press "C" to reveal the secret code in an alert
-  - Useful for verifying win logic quickly
-  - Remove this listener later if needed
+  Reveal code toggle:
+  - Click once shows the code
+  - Click again hides it
+*/
+function handleRevealCodeToggle() {
+    isCodeVisible = !isCodeVisible;
+    renderCodeReveal();
+}
+
+/*
+  Keyboard shortcut:
+  - Press "C" to toggle code visibility too
 */
 function handleKeyDown(event) {
     if (event.key.toLowerCase() !== "c") return;
-
-    const names = secretCode.map(c => c.name).join(", ");
-    alert(`Secret code: ${names}`);
+    isCodeVisible = !isCodeVisible;
+    renderCodeReveal();
 }
 
 /*-------------------------------- Initialization ----------------------------*/
 
 /*
   init() is idempotent:
-  - Calling init() always creates a fresh valid starting state
+  - Calling init() always resets to a correct fresh game state
 */
 function init() {
-    secretCode = Object.freeze(getRandomCode());
+    secretCode = Object.freeze(getRandomCodeNoDuplicates());
     currentGuess = [];
     turn = 0;
     gameStatus = "playing";
     isSoundOn = true;
 
+    /* Read current theme from HTML or default to light */
+    theme = document.documentElement.getAttribute("data-theme") || "light";
+
     guesses = [];
     feedbacks = [];
+
+    /* Reveal code starts hidden */
+    isCodeVisible = false;
 
     renderMessage();
     renderGuessSlots();
@@ -379,6 +420,8 @@ function init() {
     renderBoard();
     renderSubmitButton();
     renderSoundToggle();
+    renderThemeToggle();
+    renderCodeReveal();
 }
 
 /*-------------------------------- Listeners --------------------------------*/
@@ -387,6 +430,8 @@ paletteEl.addEventListener("click", handlePaletteClick);
 submitBtnEl.addEventListener("click", handleSubmitGuess);
 resetBtnEl.addEventListener("click", handleReset);
 soundToggleEl.addEventListener("click", handleSoundToggle);
+themeToggleEl.addEventListener("click", handleThemeToggle);
+revealCodeBtnEl.addEventListener("click", handleRevealCodeToggle);
 window.addEventListener("keydown", handleKeyDown);
 
 /*-------------------------------- Start Game --------------------------------*/
